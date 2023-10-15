@@ -84,7 +84,7 @@ fn main() {
     if args.search_string.len() > 1 {
         phrase_lookup = true;
         for word in args.search_string {
-            if search_string.len() > 0 {
+            if !search_string.is_empty() {
                 search_string += " ";
             }
             search_string += &word.to_lowercase();
@@ -103,8 +103,11 @@ fn main() {
     }
     let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
     let mut word_list: Vec<String> = Vec::new();
-    if phrase_lookup && ! args.lookup {
-        println!("{}", "\nError: can only look for multiple words in --lookup mode".red());
+    if phrase_lookup && !args.lookup {
+        println!(
+            "{}",
+            "\nError: can only look for multiple words in --lookup mode".red()
+        );
         let _ = cmd.print_help();
         exit(11);
     }
@@ -341,12 +344,7 @@ fn spellingbee(search_string: &str, word_list: &Vec<String>, debug: bool) -> Vec
     results
 }
 
-fn wordle(
-    search_string: &str,
-    word_list: &[String],
-    exclude: &str,
-    include: &str,
-) -> Vec<String> {
+fn wordle(search_string: &str, word_list: &[String], exclude: &str, include: &str) -> Vec<String> {
     // First we do a lookup using just the "green" letters
     // (i.e. those supplied in the search string), excluding the exclude letters:
     let results = lookup(search_string, word_list, exclude);
@@ -374,7 +372,7 @@ fn check_yellow_letters_exist(w: &str, search_string: &str, yellow_letters: &str
     // Now we can just check all of the yellow letters exist
     for i in 0..yellow_letters.as_bytes().len() {
         let c = yellow_letters.as_bytes()[i] as char;
-        if ! word.contains(c) {
+        if !word.contains(c) {
             return false;
         }
     }
@@ -457,7 +455,8 @@ mod tests {
         assert_eq!(results2.len(), 0); // should not match anything
         let results3 = lookup("fra_____", &words, "z");
         assert_eq!(results3.len(), 0); // should not match anything
-    }    #[test]
+    }
+    #[test]
 
     fn test_lookup_phrase() {
         let words = vec![
@@ -494,7 +493,6 @@ mod tests {
         // that there's ANOTHER yellow d
         let results4 = wordle("d____", &words, "", "d");
         assert_eq!(results4.len(), 2); // should only match "druid", and "dodge"
-
     }
 
     #[test]
