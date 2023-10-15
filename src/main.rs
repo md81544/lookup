@@ -17,7 +17,6 @@ use std::process::exit;
 // * Wordle: need an easy way to say that a yellow character shouldn't be in a particular position
 //   (not sure how practical this might be!)
 // * Wordle: might be an idea to order results by most common letters?
-// * Maybe incorporate the phrases lookup for crosswords
 // * (To think about) - maybe some way of marking off words tried in 'panagram' - perhaps
 //   an interface where the words disappear when selected? Curses?
 
@@ -36,7 +35,8 @@ struct Args {
     /// "Spelling Bee" search (NYT Puzzles). Put the mandatory letter first in the search string.
     #[arg(short, long, default_value_t = false)]
     spellingbee: bool,
-    /// "Wordle" search (NYT Puzzles). Use, e.g. Ke___ to signify K is green, e is yellow etc.
+    /// "Wordle" search (NYT Puzzles). Use, e.g. k____ to signify K is "green", use -i to include
+    /// "yellow" letters, and -x to exclude "grey" letters
     #[arg(short, long, default_value_t = false)]
     wordle: bool,
     /// Plain anagram solver
@@ -48,7 +48,8 @@ struct Args {
     /// Letters to exclude ("grey") for Wordle search
     #[arg(short = 'x', long, default_value = "", requires = "wordle")]
     exclude: String,
-    /// Lookup partial match, e.g. "c_mp_t_r" would yield "computer"
+    /// Lookup partial match, e.g. "c_mp_t_r" would yield "computer". You can also look up
+    /// phrases, for example "l_k_ m_g_c" would match "like magic".
     #[arg(short, long, default_value_t = false)]
     lookup: bool,
     /// Word obscurity level 1 = everyday, 2 = bigger list, 3 = a lot of weird words
@@ -61,8 +62,9 @@ struct Args {
     #[arg(short, long, default_value_t = false)]
     debug: bool,
     // Search string
-    #[arg(index(1))]
-    search_string: String,
+    #[arg()]
+    //#[arg(index(1))]
+    search_string: Vec<String>,
 }
 
 fn main() {
@@ -76,13 +78,36 @@ fn main() {
         exit(10);
     }
 
+    let mut phrase_lookup = false;
+    // The search string can be multiple words, if it is we infer it's a phrase lookup.
+    let mut search_string = "".to_string();
+    if args.search_string.len() > 1 {
+        phrase_lookup = true;
+        for word in args.search_string {
+            if search_string.len() > 0 {
+                search_string += " ";
+            }
+            search_string += &word.to_lowercase();
+        }
+    } else {
+        search_string = args.search_string[0].clone();
+    }
+
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
     if args.debug {
         // very small file for testing
         file_name = "./words_debug.txt".to_string();
     }
+    if phrase_lookup {
+        file_name = "./phrases.txt".to_string();
+    }
     let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
     let mut word_list: Vec<String> = Vec::new();
+    if phrase_lookup && ! args.lookup {
+        println!("{}", "\nError: can only look for multiple words in --lookup mode".red());
+        let _ = cmd.print_help();
+        exit(11);
+    }
 
     // Word list file must exist in the current path
     let mut vec_index = 0usize;
@@ -115,7 +140,6 @@ fn main() {
     }
 
     let mut results: Vec<String> = Vec::new();
-    let search_string = args.search_string.to_lowercase();
 
     // Check which action flags have been set and act accordingly
     if args.panagram {
@@ -145,7 +169,7 @@ fn main() {
     results.sort();
     display_results(
         &results,
-        &args.search_string,
+        &search_string,
         args.panagram,
         args.spellingbee,
         args.wide,
@@ -433,6 +457,16 @@ mod tests {
         assert_eq!(results2.len(), 0); // should not match anything
         let results3 = lookup("fra_____", &words, "z");
         assert_eq!(results3.len(), 0); // should not match anything
+    }    #[test]
+
+    fn test_lookup_phrase() {
+        let words = vec![
+            "i feel fine".to_string(),
+            "a fine mess".to_string(),
+            "a dead duck".to_string(),
+        ];
+        let results = lookup("a d___ ___k", &words, "");
+        assert_eq!(results.len(), 1); // should match "a dead duck"
     }
 
     #[test]
