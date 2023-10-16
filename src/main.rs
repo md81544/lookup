@@ -224,7 +224,12 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
                 break;
             }
             if search_string.as_bytes()[i] == 95 {
-                // wildcard (underscore)
+                // wildcard (underscore) - we only pass this if the character we're comparing
+                // is not a space (i.e. we wouldn't want "__ _____" to match "AA AA AA")
+                if word.as_bytes()[i] == 32 {
+                    matched = false;
+                    break;
+                }
                 continue;
             }
             if search_string.as_bytes()[i] != word.as_bytes()[i] {
@@ -463,9 +468,12 @@ mod tests {
             "i feel fine".to_string(),
             "a fine mess".to_string(),
             "a dead duck".to_string(),
+            "a dandelion".to_string(),
         ];
         let results = lookup("a d___ ___k", &words, "");
         assert_eq!(results.len(), 1); // should match "a dead duck"
+        let results2= lookup("a d________", &words, "");
+        assert_eq!(results2.len(), 1); // should only match "a dandelion", not "a dead duck"
     }
 
     #[test]
