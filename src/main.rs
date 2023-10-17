@@ -475,7 +475,7 @@ mod tests {
         ];
         let results = lookup("a d___ ___k", &words, "");
         assert_eq!(results.len(), 1); // should match "a dead duck"
-        let results2= lookup("a d________", &words, "");
+        let results2 = lookup("a d________", &words, "");
         assert_eq!(results2.len(), 1); // should only match "a dandelion", not "a dead duck"
     }
 
@@ -508,9 +508,7 @@ mod tests {
 
     #[test]
     fn test_wordle_exclude_green() {
-        let words = vec![
-            "adult".to_string(),
-        ];
+        let words = vec!["adult".to_string()];
         // Case where the user might have excluded a letter which is also in the search
         // string (i.e. is "green"). This should exclude words that have the excluded letter
         // in any position OTHER than the supplied green one.
