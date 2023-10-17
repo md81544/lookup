@@ -219,7 +219,10 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
         }
         for i in 0..word.as_bytes().len() {
             let c = word.as_bytes()[i] as char;
-            if exclude.contains(c) {
+            let search_char = search_string.as_bytes()[i] as char;
+            // Only exclude characters if they aren't explicitly at this position in the
+            // search string, meaning "a___t -x a" would still match "avast", for example
+            if c != search_char && exclude.contains(c) {
                 matched = false;
                 break;
             }
@@ -501,6 +504,18 @@ mod tests {
         // that there's ANOTHER yellow d
         let results4 = wordle("d____", &words, "", "d");
         assert_eq!(results4.len(), 2); // should only match "druid", and "dodge"
+    }
+
+    #[test]
+    fn test_wordle_exclude_green() {
+        let words = vec![
+            "adult".to_string(),
+        ];
+        // Case where the user might have excluded a letter which is also in the search
+        // string (i.e. is "green"). This should exclude words that have the excluded letter
+        // in any position OTHER than the supplied green one.
+        let results = wordle("a___t", &words, "a", ""); // exclude, include
+        assert_eq!(results.len(), 1); // should match
     }
 
     #[test]
