@@ -15,7 +15,9 @@ use std::process::exit;
 // TODO all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
 //      so it would _probably_ be an optimisation to use bytes instead
 // * Wordle: need an easy way to say that a yellow character shouldn't be in a particular position
-//   (not sure how practical this might be!)
+//   (best idea so far is to be able to enter multiple "goes" where the user enters letters
+//   that were yellow, e.g. if I guessed "oaten" and the result was green "O" and yellow "T",
+//   the user could enter "-g O_t__" perhaps? (note upper/lower case)
 // * Wordle: might be an idea to order results by most common letters?
 // * (To think about) - maybe some way of marking off words tried in 'panagram' - perhaps
 //   an interface where the words disappear when selected? Curses?
@@ -55,9 +57,9 @@ struct Args {
     /// Word obscurity level 1 = everyday, 2 = bigger list, 3 = a lot of weird words
     #[arg(short, long, default_value_t = 1)]
     obscurity: u8,
-    /// Wide output
-    #[arg(long, default_value_t = false)]
-    wide: bool,
+    /// Narrow output (one word per line)
+    #[arg(short, long, default_value_t = false)]
+    narrow: bool,
     /// Debug output
     #[arg(short, long, default_value_t = false)]
     debug: bool,
@@ -175,7 +177,7 @@ fn main() {
         &search_string,
         args.panagram,
         args.spellingbee,
-        args.wide,
+        args.narrow,
     );
     exit(0);
 }
@@ -185,7 +187,7 @@ fn display_results(
     search_string: &str,
     panagram: bool,
     spellingbee: bool,
-    wide: bool,
+    narrow: bool,
 ) {
     for word in results {
         if (panagram && word.len() == 9) || (spellingbee && word_is_pangram(word, search_string)) {
@@ -193,7 +195,7 @@ fn display_results(
         } else {
             print!("{}", word);
         }
-        print_separator(wide);
+        print_separator(narrow);
     }
     println!();
 }
@@ -387,11 +389,11 @@ fn check_yellow_letters_exist(w: &str, search_string: &str, yellow_letters: &str
     true
 }
 
-fn print_separator(wide: bool) {
-    if wide {
-        print!(" ");
-    } else {
+fn print_separator(narrow: bool) {
+    if narrow {
         println!();
+    } else {
+        print!(" ");
     }
 }
 
