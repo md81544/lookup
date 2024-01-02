@@ -1,3 +1,5 @@
+I
+O
 a
 aah
 aardvark
@@ -27900,7 +27902,6 @@ hysteria
 hysterical
 hysterically
 hysterics
-I
 iamb
 iambic
 iambs
@@ -38086,7 +38087,6 @@ nymphomaniac
 nymphomaniacs
 nymphos
 nymphs
-O
 oaf
 oafish
 oafishly
