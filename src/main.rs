@@ -92,7 +92,9 @@ fn main() {
             search_string += &word.to_lowercase();
         }
     } else {
-        search_string = args.search_string[0].clone();
+        if args.search_string.len() > 0 {
+            search_string = args.search_string[0].clone();
+        }
     }
 
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
