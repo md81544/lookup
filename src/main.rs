@@ -27,7 +27,7 @@ use std::process::exit;
 // The following incantation defines an argument group of mutually-exclusive command flags
 #[clap(group(
     ArgGroup::new("lookups")
-        .required(true)
+        .required(false)
         .args(&["wordle", "spellingbee", "panagram", "lookup", "anagram"]),
 ))]
 struct Args {
@@ -69,6 +69,16 @@ struct Args {
     search_string: Vec<String>,
 }
 
+#[derive(Eq, PartialEq)]
+enum Action {
+    Undefined,
+    Wordle,
+    Spellingbee,
+    Panagram,
+    Lookup,
+    Anagram,
+}
+
 fn main() {
     use clap::CommandFactory;
     let mut cmd = Args::command();
@@ -91,10 +101,8 @@ fn main() {
             }
             search_string += &word.to_lowercase();
         }
-    } else {
-        if args.search_string.len() > 0 {
-            search_string = args.search_string[0].clone();
-        }
+    } else if !args.search_string.is_empty() {
+        search_string = args.search_string[0].clone();
     }
 
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
@@ -148,16 +156,41 @@ fn main() {
 
     let mut results: Vec<String> = Vec::new();
 
+    let mut action: Action = Action::Undefined;
+
     // Check which action flags have been set and act accordingly
-    if args.panagram {
+    // If none of the "types" are set then we try to infer which type
+    // is required from the input
+    if !args.panagram && !args.spellingbee && !args.wordle && !args.anagram && !args.lookup {
+        let mut msg = String::from("No game type specified, assuming ");
+        if search_string.contains('_') {
+            action = Action::Lookup;
+            msg += "lookup";
+        } else if search_string.len() == 5 {
+            action = Action::Wordle;
+            msg += "Wordle";
+        } else if search_string.len() == 9 {
+            action = Action::Panagram;
+            msg += "Panagram";
+        } else if search_string.len() == 7 {
+            action = Action::Spellingbee;
+            msg += "Spelling Bee";
+        } else {
+            action = Action::Anagram;
+            msg += "anagram";
+        }
+        println!("{}", msg.yellow())
+    }
+
+    if action == Action::Panagram {
         results = panagram(&search_string, &word_list, &anagrams);
     }
 
-    if args.spellingbee {
+    if action == Action::Spellingbee {
         results = spellingbee(&search_string, &word_list, args.debug);
     }
 
-    if args.wordle {
+    if action == Action::Wordle {
         if search_string.len() != 5 {
             println!("Search string is not five characters");
             exit(6);
@@ -165,34 +198,24 @@ fn main() {
         results = wordle(&search_string, &word_list, &args.exclude, &args.include);
     }
 
-    if args.anagram {
+    if action == Action::Anagram {
         results = anagram_search(&search_string, &word_list, &anagrams);
     }
 
-    if args.lookup {
+    if action == Action::Lookup {
         results = lookup(&search_string, &word_list, "");
     }
 
     results.sort();
-    display_results(
-        &results,
-        &search_string,
-        args.panagram,
-        args.spellingbee,
-        args.narrow,
-    );
+    display_results(&results, &search_string, action, args.narrow);
     exit(0);
 }
 
-fn display_results(
-    results: &Vec<String>,
-    search_string: &str,
-    panagram: bool,
-    spellingbee: bool,
-    narrow: bool,
-) {
+fn display_results(results: &Vec<String>, search_string: &str, action: Action, narrow: bool) {
     for word in results {
-        if (panagram && word.len() == 9) || (spellingbee && word_is_pangram(word, search_string)) {
+        if (action == Action::Panagram && word.len() == 9)
+            || (action == Action::Spellingbee && word_is_pangram(word, search_string))
+        {
             print!("{}", word.to_uppercase().bold());
         } else {
             print!("{}", word);
