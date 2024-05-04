@@ -28,7 +28,7 @@ use std::process::exit;
 #[clap(group(
     ArgGroup::new("lookups")
         .required(false)
-        .args(&["wordle", "spellingbee", "panagram", "lookup", "anagram"]),
+        .args(&["wordle", "spellingbee", "panagram", "lookup", "anagram", "jumble"]),
 ))]
 struct Args {
     /// "Panagram" search (Telegraph Puzzles). Put the mandatory letter first in the search string.
@@ -67,6 +67,9 @@ struct Args {
     #[arg()]
     //#[arg(index(1))]
     search_string: Vec<String>,
+    /// Jumble letters (for manual anagram solving)
+    #[arg(short, long, default_value_t = false)]
+    jumble: bool,
 }
 
 #[derive(Eq, PartialEq)]
@@ -77,6 +80,7 @@ enum Action {
     Panagram,
     Lookup,
     Anagram,
+    Jumble
 }
 
 fn main() {
@@ -103,6 +107,11 @@ fn main() {
         }
     } else if !args.search_string.is_empty() {
         search_string = args.search_string[0].clone().to_lowercase();
+    }
+
+    if search_string.is_empty() {
+        let _ = cmd.print_help();
+        exit(1);
     }
 
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
@@ -159,9 +168,28 @@ fn main() {
     let mut action: Action = Action::Undefined;
 
     // Check which action flags have been set and act accordingly
+    if args.panagram {
+        action = Action::Panagram;
+    }
+    if args.spellingbee {
+        action = Action::Spellingbee;
+    }
+    if args.wordle {
+        action = Action::Wordle;
+    }
+    if args.anagram {
+        action = Action::Anagram;
+    }
+    if args.lookup {
+        action = Action::Lookup;
+    }
+    if args.jumble {
+        action = Action::Jumble;
+    }
+
     // If none of the "types" are set then we try to infer which type
     // is required from the input
-    if !args.panagram && !args.spellingbee && !args.wordle && !args.anagram && !args.lookup {
+    if action == Action::Undefined {
         let mut msg = String::from("No game type specified, assuming ");
         if search_string.contains('_') {
             action = Action::Lookup;
@@ -186,11 +214,11 @@ fn main() {
         results = panagram(&search_string, &word_list, &anagrams);
     }
 
-    if action == Action::Spellingbee {
+    else if action == Action::Spellingbee {
         results = spellingbee(&search_string, &word_list, args.debug);
     }
 
-    if action == Action::Wordle {
+    else if action == Action::Wordle {
         if search_string.len() != 5 {
             println!("Search string is not five characters");
             exit(6);
@@ -198,12 +226,17 @@ fn main() {
         results = wordle(&search_string, &word_list, &args.exclude, &args.include);
     }
 
-    if action == Action::Anagram {
+    else if action == Action::Anagram {
         results = anagram_search(&search_string, &word_list, &anagrams);
     }
 
-    if action == Action::Lookup {
+    else if action == Action::Lookup {
         results = lookup(&search_string, &word_list, "");
+    }
+
+    else if action == Action::Jumble {
+        // TODO
+        jumble(&search_string);
     }
 
     results.sort();
@@ -319,6 +352,12 @@ fn panagram(
         }
     }
     results
+}
+
+fn jumble(_search_string: &str) {
+    // All this does is print the letters randomly around in a rough circle
+    let mut _chars: Vec<_> = _search_string.chars().collect();
+    println!("TODO!");
 }
 
 fn spellingbee(search_string: &str, word_list: &Vec<String>, debug: bool) -> Vec<String> {
