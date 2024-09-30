@@ -1,6 +1,8 @@
 use clap::{ArgGroup, Parser};
 use colored::Colorize;
 use itertools::Itertools;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -8,6 +10,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use std::process::exit;
+use regex::Regex;
 
 // Note, word lists are generated from public domain word lists,
 // see http://wordlist.aspell.net/12dicts-readme/
@@ -44,6 +47,9 @@ struct Args {
     /// Plain anagram solver
     #[arg(short, long, default_value_t = false)]
     anagram: bool,
+    /// Regex lookup - best single quoted, normally you will need ^/$ at beginning/end
+    #[arg(short, long, default_value_t = false)]
+    regex: bool,
     /// Letters to include ("yellow") for Wordle search
     #[arg(short, long, default_value = "", requires = "wordle")]
     include: String,
@@ -80,7 +86,8 @@ enum Action {
     Panagram,
     Lookup,
     Anagram,
-    Jumble
+    Jumble,
+    Regex,
 }
 
 fn main() {
@@ -186,6 +193,9 @@ fn main() {
     if args.jumble {
         action = Action::Jumble;
     }
+    if args.regex {
+        action = Action::Regex;
+    }
 
     // If none of the "types" are set then we try to infer which type
     // is required from the input
@@ -212,29 +222,21 @@ fn main() {
 
     if action == Action::Panagram {
         results = panagram(&search_string, &word_list, &anagrams);
-    }
-
-    else if action == Action::Spellingbee {
+    } else if action == Action::Spellingbee {
         results = spellingbee(&search_string, &word_list, args.debug);
-    }
-
-    else if action == Action::Wordle {
+    } else if action == Action::Wordle {
         if search_string.len() != 5 {
             println!("Search string is not five characters");
             exit(6);
         }
         results = wordle(&search_string, &word_list, &args.exclude, &args.include);
-    }
-
-    else if action == Action::Anagram {
+    } else if action == Action::Anagram {
         results = anagram_search(&search_string, &word_list, &anagrams);
-    }
-
-    else if action == Action::Lookup {
+    } else if action == Action::Lookup {
         results = lookup(&search_string, &word_list, "");
-    }
-
-    else if action == Action::Jumble {
+    } else if action == Action::Regex {
+        results = regex_lookup(&search_string, &word_list, "");
+    } else if action == Action::Jumble {
         // TODO
         jumble(&search_string);
     }
@@ -307,6 +309,18 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
     results
 }
 
+fn regex_lookup(search_string: &str, word_list: &[String], _exclude: &str) -> Vec<String> {
+    let mut results: Vec<String> = Vec::new();
+    let re = Regex::new(search_string).unwrap();
+
+    for word in word_list {
+        if re.is_match(word) {
+            results.push(word.to_string());
+        }
+    }
+    results
+}
+
 fn anagram_search(
     search_string: &str,
     word_list: &[String],
@@ -356,8 +370,20 @@ fn panagram(
 
 fn jumble(_search_string: &str) {
     // All this does is print the letters randomly around in a rough circle
-    let mut _chars: Vec<_> = _search_string.chars().collect();
-    println!("TODO!");
+    let mut chars: Vec<_> = _search_string.chars().collect();
+    chars.shuffle(&mut thread_rng());
+    // Add a space if we have an odd number of characters
+    if chars.len() % 2 == 1 {
+        chars.push(' ');
+    }
+    let lines = chars.len() / 2;
+    for i in 0..lines {
+        // margin
+        print!("  ");
+        // TODO: Need to space these
+        print!("{}", chars[i * 2]);
+        println!("{}", chars[i * 2 + 1]);
+    }
 }
 
 fn spellingbee(search_string: &str, word_list: &Vec<String>, debug: bool) -> Vec<String> {
