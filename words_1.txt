@@ -44909,6 +44909,8 @@ pyrotechnic
 pyrotechnics
 python
 pythons
+qatar
+qatari
 qua
 quack
 quacked
