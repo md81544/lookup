@@ -231610,6 +231610,7 @@ swearings
 swears
 swearword
 swearwords
+sweary
 sweat
 sweatband
 sweatbands
