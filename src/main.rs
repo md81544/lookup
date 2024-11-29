@@ -3,6 +3,7 @@ use colored::Colorize;
 use itertools::Itertools;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use regex::Regex;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::collections::HashSet;
@@ -10,7 +11,6 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use std::process::exit;
-use regex::Regex;
 
 // Note, word lists are generated from public domain word lists,
 // see http://wordlist.aspell.net/12dicts-readme/
@@ -170,6 +170,29 @@ fn main() {
         exit(2);
     }
 
+    // Also add phrases to the anagram list
+    file_name = "./phrases.txt".to_string();
+    if let Ok(lines) = read_lines(&file_name) {
+        for word in lines.flatten() {
+            word_list.push(word.clone());
+            let anagram = sort_word(&word);
+            // Does this entry already exist? Add to vec if so, else create new vec
+            match anagrams.entry(anagram) {
+                Entry::Vacant(e) => {
+                    e.insert(vec![vec_index]);
+
+                }
+                Entry::Occupied(mut e) => {
+                    e.get_mut().push(vec_index);
+                }
+            }
+            vec_index += 1;
+        }
+    } else {
+        println!("Could not read {}", file_name);
+        exit(2);
+    }
+
     let mut results: Vec<String> = Vec::new();
 
     let mut action: Action = Action::Undefined;
@@ -248,12 +271,18 @@ fn main() {
 
 fn display_results(results: &Vec<String>, search_string: &str, action: Action, narrow: bool) {
     for word in results {
+        if word.contains(char::is_whitespace){
+            print!("'");
+        }
         if (action == Action::Panagram && word.len() == 9)
             || (action == Action::Spellingbee && word_is_pangram(word, search_string))
         {
             print!("{}", word.to_uppercase().bold());
         } else {
             print!("{}", word);
+        }
+        if word.contains(char::is_whitespace){
+            print!("'");
         }
         print_separator(narrow);
     }
@@ -496,7 +525,9 @@ where
 }
 
 fn sort_word(word: &str) -> String {
-    word.chars().sorted().collect::<String>()
+    // Strip all whitespace
+    let no_space: String = word.chars().filter(|c| !c.is_whitespace()).collect();
+    no_space.chars().sorted().collect::<String>()
 }
 
 #[cfg(test)]
