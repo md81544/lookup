@@ -412,11 +412,11 @@ fn jumble(_search_string: &str) {
         let front_spaces = i8::abs(spaces as i8 - i as i8);
         let mid_spaces = spaces as i8 - front_spaces;
         for _ in 0..front_spaces {
-            print!(" ");
+            print!("  ");
         }
         print!("{}", chars[i * 2].to_ascii_uppercase());
-        for _ in 0..mid_spaces * 2 + 2 {
-            print!(" ");
+        for _ in 0..mid_spaces * 2 + 1 {
+            print!("  ");
         }
         println!("{}", chars[i * 2 + 1].to_ascii_uppercase());
     }
