@@ -180,7 +180,6 @@ fn main() {
             match anagrams.entry(anagram) {
                 Entry::Vacant(e) => {
                     e.insert(vec![vec_index]);
-
                 }
                 Entry::Occupied(mut e) => {
                     e.get_mut().push(vec_index);
@@ -271,7 +270,7 @@ fn main() {
 
 fn display_results(results: &Vec<String>, search_string: &str, action: Action, narrow: bool) {
     for word in results {
-        if word.contains(char::is_whitespace){
+        if word.contains(char::is_whitespace) {
             print!("'");
         }
         if (action == Action::Panagram && word.len() == 9)
@@ -281,7 +280,7 @@ fn display_results(results: &Vec<String>, search_string: &str, action: Action, n
         } else {
             print!("{}", word);
         }
-        if word.contains(char::is_whitespace){
+        if word.contains(char::is_whitespace) {
             print!("'");
         }
         print_separator(narrow);
@@ -406,12 +405,19 @@ fn jumble(_search_string: &str) {
         chars.push(' ');
     }
     let lines = chars.len() / 2;
+    let spaces = lines / 2;
     for i in 0..lines {
-        // margin
-        print!("  ");
-        // TODO: Need to space these
-        print!("{}", chars[i * 2]);
-        println!("{}", chars[i * 2 + 1]);
+        print!("  "); // margin
+        let front_spaces = i8::abs(spaces as i8 - i as i8);
+        let mid_spaces = spaces as i8 - front_spaces;
+        for _ in 0..front_spaces {
+            print!(" ");
+        }
+        print!("{}", chars[i * 2].to_ascii_uppercase());
+        for _ in 0..mid_spaces * 2 + 2 {
+            print!(" ");
+        }
+        println!("{}", chars[i * 2 + 1].to_ascii_uppercase());
     }
 }
 
