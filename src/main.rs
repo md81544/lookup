@@ -404,6 +404,7 @@ fn jumble(_search_string: &str) {
     if chars.len() % 2 == 1 {
         chars.push(' ');
     }
+    println!("");
     let lines = chars.len() / 2;
     let spaces = lines / 2;
     for i in 0..lines {
