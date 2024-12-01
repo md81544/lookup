@@ -7,6 +7,7 @@ use regex::Regex;
 use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::collections::HashSet;
+use std::f32::consts::PI;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -396,29 +397,38 @@ fn panagram(
     results
 }
 
-fn jumble(_search_string: &str) {
-    // All this does is print the letters randomly around in a rough circle
-    let mut chars: Vec<_> = _search_string.chars().collect();
-    chars.shuffle(&mut thread_rng());
-    // Add a space if we have an odd number of characters
-    if chars.len() % 2 == 1 {
-        chars.push(' ');
-    }
+fn jumble(input: &str) {
     println!("");
-    let lines = chars.len() / 2;
-    let spaces = lines / 2;
-    for i in 0..lines {
-        print!("  "); // margin
-        let front_spaces = i8::abs(spaces as i8 - i as i8);
-        let mid_spaces = spaces as i8 - front_spaces;
-        for _ in 0..front_spaces {
-            print!("  ");
-        }
-        print!("{}", chars[i * 2].to_ascii_uppercase());
-        for _ in 0..mid_spaces * 2 + 1 {
-            print!("  ");
-        }
-        println!("{}", chars[i * 2 + 1].to_ascii_uppercase());
+    let mut chars: Vec<char> = input.chars().collect();
+    let len = chars.len();
+
+    let mut rng = thread_rng();
+    chars.shuffle(&mut rng);
+
+    let radius = ((len as f32 / PI).sqrt().ceil()) as usize;
+    let mut grid = vec![vec![' '; radius * 4 + 1]; radius * 2 + 1];
+
+    for i in 0..len / 2 {
+        let angle = (i as f32 / (len / 2) as f32) * PI;
+
+        let x1 = (radius as f32 * angle.cos()).round() as isize;
+        let y1 = (radius as f32 * angle.sin()).round() as isize;
+
+        let x2 = -(radius as f32 * angle.cos()).round() as isize;
+        let y2 = -(radius as f32 * angle.sin()).round() as isize;
+
+        grid[(y1 + radius as isize) as usize][(x1 * 2 + radius as isize * 2) as usize] =
+            chars[i * 2];
+        grid[(y2 + radius as isize) as usize][(x2 * 2 + radius as isize * 2) as usize] =
+            chars[i * 2 + 1];
+    }
+
+    if len % 2 == 1 {
+        grid[radius][radius * 2] = chars[len - 1]; // Place at the center of the grid
+    }
+
+    for row in grid {
+        println!("  {}", row.iter().collect::<String>());
     }
 }
 

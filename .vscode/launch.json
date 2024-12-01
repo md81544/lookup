@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": [],
+            "args": ["-j",  "lookeddswy"],
             "cwd": "${workspaceFolder}"
         },
         {
