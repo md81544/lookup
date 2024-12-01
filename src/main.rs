@@ -418,9 +418,9 @@ fn jumble(input: &str) {
         let y2 = -(radius as f32 * angle.sin()).round() as isize;
 
         grid[(y1 + radius as isize) as usize][(x1 * 2 + radius as isize * 2) as usize] =
-            chars[i * 2];
+            chars[i * 2].to_ascii_uppercase();
         grid[(y2 + radius as isize) as usize][(x2 * 2 + radius as isize * 2) as usize] =
-            chars[i * 2 + 1];
+            chars[i * 2 + 1].to_ascii_uppercase();
     }
 
     if len % 2 == 1 {
