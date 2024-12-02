@@ -400,6 +400,9 @@ fn panagram(
 fn jumble(input: &str) {
     println!("");
     let mut chars: Vec<char> = input.chars().collect();
+    if chars.len() % 2 == 1 {
+        chars.push(' ');
+    }
     let len = chars.len();
 
     let mut rng = thread_rng();
@@ -421,10 +424,6 @@ fn jumble(input: &str) {
             chars[i * 2].to_ascii_uppercase();
         grid[(y2 + radius as isize) as usize][(x2 * 2 + radius as isize * 2) as usize] =
             chars[i * 2 + 1].to_ascii_uppercase();
-    }
-
-    if len % 2 == 1 {
-        grid[radius][radius * 2] = chars[len - 1]; // Place at the center of the grid
     }
 
     for row in grid {
