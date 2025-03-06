@@ -132,13 +132,9 @@ fn main() {
     }
     let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
     let mut word_list: Vec<String> = Vec::new();
+    let mut lookup_mode = false;
     if phrase_lookup && !args.lookup {
-        println!(
-            "{}",
-            "\nError: can only look for multiple words in --lookup mode".red()
-        );
-        let _ = cmd.print_help();
-        exit(11);
+        lookup_mode = true;
     }
 
     // Word list file must exist in the current path
@@ -224,7 +220,7 @@ fn main() {
     // is required from the input
     if action == Action::Undefined {
         let mut msg = String::from("No game type specified, assuming ");
-        if search_string.contains('_') {
+        if lookup_mode || search_string.contains('_') {
             action = Action::Lookup;
             msg += "lookup";
         } else if search_string.len() == 5 {
