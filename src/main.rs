@@ -77,6 +77,9 @@ struct Args {
     /// Jumble letters (for manual anagram solving)
     #[arg(short, long, default_value_t = false)]
     jumble: bool,
+    /// Found letters confirmed in anagram for jumble, e.g. C_M_P_T_R
+    #[arg(short, long, default_value = "", requires = "jumble")]
+    found: String,
 }
 
 #[derive(Eq, PartialEq)]
@@ -256,8 +259,8 @@ fn main() {
     } else if action == Action::Regex {
         results = regex_lookup(&search_string, &word_list, "");
     } else if action == Action::Jumble {
-        // TODO
-        jumble(&search_string);
+        let letters = args.found.clone();
+        jumble(&search_string.to_uppercase(), &letters.to_uppercase());
     }
 
     results.sort();
@@ -393,7 +396,10 @@ fn panagram(
     results
 }
 
-fn jumble(input: &str) {
+fn jumble(full_input: &str, found_letters: &str) {
+    // Remove underscores from found_letters
+    let found: Vec<char> = found_letters.chars().filter(|&c| c != '_').collect();
+    let input: String = full_input.chars().filter(|c| !found.contains(c)).collect();
     println!("");
     let mut chars: Vec<char> = input.chars().collect();
     if chars.len() % 2 == 1 {
@@ -425,6 +431,12 @@ fn jumble(input: &str) {
     for row in grid {
         println!("  {}", row.iter().collect::<String>());
     }
+    println!("");
+    print!("  ");
+    for c in found_letters.chars() {
+        print!("{} ", c.to_ascii_uppercase());
+    }
+    println!("");
 }
 
 fn spellingbee(search_string: &str, word_list: &Vec<String>, debug: bool) -> Vec<String> {
