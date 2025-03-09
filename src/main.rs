@@ -143,7 +143,7 @@ fn main() {
     // Word list file must exist in the current path
     let mut vec_index = 0usize;
     if let Ok(lines) = read_lines(&file_name) {
-        for word in lines.flatten() {
+        for word in lines.map_while(Result::ok) {
             if args.wordle {
                 // if we're doing a wordle lookup, we're only interested in five-letter words
                 // and we don't care about anagrams
@@ -173,7 +173,7 @@ fn main() {
     // Also add phrases to the anagram list
     file_name = "./phrases.txt".to_string();
     if let Ok(lines) = read_lines(&file_name) {
-        for word in lines.flatten() {
+        for word in lines.map_while(Result::ok) {
             word_list.push(word.clone());
             let anagram = sort_word(&word);
             // Does this entry already exist? Add to vec if so, else create new vec
@@ -307,7 +307,7 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
         if word.len() != search_string.len() {
             continue;
         }
-        for i in 0..word.as_bytes().len() {
+        for i in 0..word.len() {
             let c = word.as_bytes()[i] as char;
             let search_char = search_string.as_bytes()[i] as char;
             // Only exclude characters if they aren't explicitly at this position in the
@@ -400,7 +400,7 @@ fn jumble(full_input: &str, found_letters: &str) {
     // Remove underscores from found_letters
     let found: Vec<char> = found_letters.chars().filter(|&c| c != '_').collect();
     let input: String = full_input.chars().filter(|c| !found.contains(c)).collect();
-    println!("");
+    println!();
     let mut chars: Vec<char> = input.chars().collect();
     if chars.len() % 2 == 1 {
         chars.push(' ');
@@ -431,12 +431,12 @@ fn jumble(full_input: &str, found_letters: &str) {
     for row in grid {
         println!("  {}", row.iter().collect::<String>());
     }
-    println!("");
+    println!();
     print!("  ");
     for c in found_letters.chars() {
         print!("{} ", c.to_ascii_uppercase());
     }
-    println!("");
+    println!();
 }
 
 fn spellingbee(search_string: &str, word_list: &Vec<String>, debug: bool) -> Vec<String> {
@@ -523,7 +523,7 @@ fn check_yellow_letters_exist(w: &str, search_string: &str, yellow_letters: &str
         }
     }
     // Now we can just check all of the yellow letters exist
-    for i in 0..yellow_letters.as_bytes().len() {
+    for i in 0..yellow_letters.len() {
         let c = yellow_letters.as_bytes()[i] as char;
         if !word.contains(c) {
             return false;
