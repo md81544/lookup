@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-j",  "copmuter", "-f", "C_MP___R"],
+            "args": ["___E", "__", "_A__"],
             "cwd": "${workspaceFolder}"
         },
         {

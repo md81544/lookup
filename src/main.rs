@@ -301,7 +301,7 @@ fn word_is_pangram(word: &str, search_string: &str) -> bool {
 }
 
 fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
+    let mut results: HashSet<String> = HashSet::new();
     for word in word_list {
         let mut matched = true;
         if word.len() != search_string.len() {
@@ -331,10 +331,10 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
             }
         }
         if matched {
-            results.push(word.to_string());
+            results.insert(word.to_string());
         }
     }
-    results
+    results.into_iter().collect()
 }
 
 fn regex_lookup(search_string: &str, word_list: &[String], _exclude: &str) -> Vec<String> {
