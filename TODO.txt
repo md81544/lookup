@@ -1,5 +1,9 @@
-Jumble --found option should only remove ONE letter from the search string
-(e.g. "lookup -j kidprock -f ____KICK" currently removes both Ks)
-
-Also Jumble --found should error if the --found string is a different length from
-the input string
+* all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
+  so it would _probably_ be an optimisation to use bytes instead
+* Wordle: need an easy way to say that a yellow character shouldn't be in a particular position
+  (best idea so far is to be able to enter multiple "goes" where the user enters letters
+  that were yellow, e.g. if I guessed "oaten" and the result was green "O" and yellow "T",
+  the user could enter "-g O_t__" perhaps? (note upper/lower case)
+* Wordle: might be an idea to order results by most common letters?
+* (To think about) - maybe some way of marking off words tried in 'panagram' - perhaps
+  an interface where the words disappear when selected? Curses?

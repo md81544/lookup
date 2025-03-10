@@ -16,16 +16,6 @@ use std::process::exit;
 // Note, word lists are generated from public domain word lists,
 // see http://wordlist.aspell.net/12dicts-readme/
 
-// TODO all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
-//      so it would _probably_ be an optimisation to use bytes instead
-// * Wordle: need an easy way to say that a yellow character shouldn't be in a particular position
-//   (best idea so far is to be able to enter multiple "goes" where the user enters letters
-//   that were yellow, e.g. if I guessed "oaten" and the result was green "O" and yellow "T",
-//   the user could enter "-g O_t__" perhaps? (note upper/lower case)
-// * Wordle: might be an idea to order results by most common letters?
-// * (To think about) - maybe some way of marking off words tried in 'panagram' - perhaps
-//   an interface where the words disappear when selected? Curses?
-
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 // The following incantation defines an argument group of mutually-exclusive command flags
@@ -260,6 +250,10 @@ fn main() {
         results = regex_lookup(&search_string, &word_list, "");
     } else if action == Action::Jumble {
         let letters = args.found.clone();
+        if letters.len() != search_string.len() {
+            println!("Error: 'found' letters must be same length as search string");
+            exit(7);
+        }
         jumble(&search_string.to_uppercase(), &letters.to_uppercase());
     }
 
@@ -398,8 +392,12 @@ fn panagram(
 
 fn jumble(full_input: &str, found_letters: &str) {
     // Remove underscores from found_letters
-    let found: Vec<char> = found_letters.chars().filter(|&c| c != '_').collect();
-    let input: String = full_input.chars().filter(|c| !found.contains(c)).collect();
+    let mut input: String = full_input.to_string();
+    for c in found_letters.chars() {
+        if let Some(pos) = input.find(c) {
+            input.remove(pos);
+        }
+    }
     println!();
     let mut chars: Vec<char> = input.chars().collect();
     if chars.len() % 2 == 1 {
