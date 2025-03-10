@@ -1,0 +1,5 @@
+Jumble --found option should only remove ONE letter from the search string
+(e.g. "lookup -j kidprock -f ____KICK" currently removes both Ks)
+
+Also Jumble --found should error if the --found string is a different length from
+the input string
