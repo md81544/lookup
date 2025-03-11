@@ -250,7 +250,7 @@ fn main() {
         results = regex_lookup(&search_string, &word_list, "");
     } else if action == Action::Jumble {
         let letters = args.found.clone();
-        if letters.len() != search_string.len() {
+        if letters.len() > 0 && letters.len() != search_string.len() {
             println!("Error: 'found' letters must be same length as search string");
             exit(7);
         }
