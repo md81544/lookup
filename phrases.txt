@@ -18291,6 +18291,7 @@ en bloc
 en brosse
 en clair
 en croute
+en famille
 en garde
 en masse
 en papillote
