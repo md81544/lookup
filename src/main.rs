@@ -394,8 +394,14 @@ fn jumble(full_input: &str, found_letters: &str) {
     // Remove underscores from found_letters
     let mut input: String = full_input.to_string();
     for c in found_letters.chars() {
-        if let Some(pos) = input.find(c) {
-            input.remove(pos);
+        if c != '_' {
+            if let Some(pos) = input.find(c) {
+                input.remove(pos);
+            } else {
+                println!("Error: You supplied a letter ({}) in the found (-f) option", c);
+                println!("which does not appear in the source set of letters");
+                return;
+            }
         }
     }
     println!();
