@@ -35,6 +35,9 @@ struct Args {
     /// "yellow" letters, and -x to exclude "grey" letters
     #[arg(short, long, default_value_t = false)]
     wordle: bool,
+    /// Thesaurus lookup. Can be combined with lookup to filter results: use BOTH -l and -t flags.
+    #[arg(short, long, default_value_t = false)]
+    thesaurus: bool,
     /// Plain anagram solver
     #[arg(short, long, default_value_t = false)]
     anagram: bool,
@@ -82,6 +85,8 @@ enum Action {
     Anagram,
     Jumble,
     Regex,
+    Thesaurus,
+    LookupWithThesaurus,
 }
 
 fn main() {
@@ -125,6 +130,7 @@ fn main() {
     }
     let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
     let mut word_list: Vec<String> = Vec::new();
+    let mut thesaurus: HashMap<String, Vec<String>> = HashMap::new();
     let mut lookup_mode = false;
     if phrase_lookup && !args.lookup {
         lookup_mode = true;
@@ -182,6 +188,28 @@ fn main() {
         exit(2);
     }
 
+    // Also read in thesaurus if required
+    if args.thesaurus {
+        file_name = "./thesaurus.txt".to_string();
+        if let Ok(lines) = read_lines(&file_name) {
+            for line in lines.map_while(Result::ok) {
+                let words = line.split(",");
+                let mut first: bool = true;
+                let mut key: String = String::new();
+                let mut synonyms: Vec<String> = Vec::new();
+                for word in words {
+                    if first {
+                        key = word.to_string();
+                        first = false;
+                    } else {
+                        synonyms.push(word.to_string());
+                    }
+                }
+                thesaurus.insert(key, synonyms);
+            }
+        }
+    }
+
     let mut results: Vec<String> = Vec::new();
 
     let mut action: Action = Action::Undefined;
@@ -207,6 +235,13 @@ fn main() {
     }
     if args.regex {
         action = Action::Regex;
+    }
+    if args.thesaurus {
+        if args.lookup {
+            action = Action::LookupWithThesaurus;
+        } else {
+            action = Action::Thesaurus;
+        }
     }
 
     // If none of the "types" are set then we try to infer which type
@@ -244,8 +279,11 @@ fn main() {
         results = wordle(&search_string, &word_list, &args.exclude, &args.include);
     } else if action == Action::Anagram {
         results = anagram_search(&search_string, &word_list, &anagrams);
-    } else if action == Action::Lookup {
+    } else if action == Action::Lookup || action == Action::LookupWithThesaurus {
         results = lookup(&search_string, &word_list, "");
+        if action == Action::LookupWithThesaurus {
+            println!("TODO: lookup with thesaurus not yet implemented");
+        }
     } else if action == Action::Regex {
         results = regex_lookup(&search_string, &word_list, "");
     } else if action == Action::Jumble {
@@ -255,6 +293,8 @@ fn main() {
             exit(7);
         }
         jumble(&search_string.to_uppercase(), &letters.to_uppercase());
+    } else if action == Action::Thesaurus {
+        results = thesaurus_lookup(&search_string, &thesaurus);
     }
 
     results.sort();
@@ -331,6 +371,13 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
     results.into_iter().collect()
 }
 
+fn thesaurus_lookup(search_string: &str, thesaurus: &HashMap<String, Vec<String>> ) -> Vec<String> {
+    if !thesaurus.contains_key(search_string) {
+        return Vec::new();
+    }
+    return thesaurus.get(search_string).unwrap_or(&Vec::new()).clone();
+}
+
 fn regex_lookup(search_string: &str, word_list: &[String], _exclude: &str) -> Vec<String> {
     let mut results: Vec<String> = Vec::new();
     let re = Regex::new(search_string).unwrap();
@@ -398,7 +445,10 @@ fn jumble(full_input: &str, found_letters: &str) {
             if let Some(pos) = input.find(c) {
                 input.remove(pos);
             } else {
-                println!("Error: You supplied a letter ({}) in the found (-f) option", c);
+                println!(
+                    "Error: You supplied a letter ({}) in the found (-f) option",
+                    c
+                );
                 println!("which does not appear in the source set of letters");
                 return;
             }
