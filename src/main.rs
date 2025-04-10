@@ -304,7 +304,7 @@ fn main() {
 
 fn display_results(results: &Vec<String>, search_string: &str, action: Action, narrow: bool) {
     for word in results {
-        if word.contains(char::is_whitespace) {
+        if word.contains(char::is_whitespace) && !narrow {
             print!("'");
         }
         if (action == Action::Panagram && word.len() == 9)
@@ -314,7 +314,7 @@ fn display_results(results: &Vec<String>, search_string: &str, action: Action, n
         } else {
             print!("{}", word);
         }
-        if word.contains(char::is_whitespace) {
+        if word.contains(char::is_whitespace) && !narrow {
             print!("'");
         }
         print_separator(narrow);
@@ -371,7 +371,7 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
     results.into_iter().collect()
 }
 
-fn thesaurus_lookup(search_string: &str, thesaurus: &HashMap<String, Vec<String>> ) -> Vec<String> {
+fn thesaurus_lookup(search_string: &str, thesaurus: &HashMap<String, Vec<String>>) -> Vec<String> {
     if !thesaurus.contains_key(search_string) {
         return Vec::new();
     }
