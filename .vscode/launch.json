@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-t", "man"],
+            "args": ["-j", "monansdlan", "-f", "N_ M___ L___"],
             "cwd": "${workspaceFolder}"
         },
         {

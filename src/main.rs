@@ -24,6 +24,7 @@ use std::process::exit;
         .required(false)
         .args(&["wordle", "spellingbee", "panagram", "lookup", "anagram", "jumble"]),
 ))]
+
 struct Args {
     /// "Panagram" search (Telegraph Puzzles). Put the mandatory letter first in the search string.
     #[arg(short, long, default_value_t = false)]
@@ -70,7 +71,8 @@ struct Args {
     /// Jumble letters (for manual anagram solving)
     #[arg(short, long, default_value_t = false)]
     jumble: bool,
-    /// Found letters confirmed in anagram for jumble, e.g. C_M_P_T_R
+    /// Found letters confirmed in anagram for jumble, e.g. C_M_P_T_R.
+    /// Use '/' for spaces, e.g. 'N_/M_NS/L_ND'
     #[arg(short, long, default_value = "", requires = "jumble")]
     found: String,
 }
@@ -288,7 +290,10 @@ fn main() {
         results = regex_lookup(&search_string, &word_list, "");
     } else if action == Action::Jumble {
         let letters = args.found.clone();
-        if letters.len() > 0 && letters.len() != search_string.len() {
+        // Note! Clap can't seem to cope with spaces in arguments, even if quoted. So
+        // we use '/' in the "found" string to indicate word boundaries, e.g. "N_/M_NS/L_ND"
+        let letters_no_spaces: String = letters.replace("/", "");
+        if letters_no_spaces.len() > 0 && letters_no_spaces.len() != search_string.len() {
             println!("Error: 'found' letters must be same length as search string");
             exit(7);
         }
@@ -441,7 +446,7 @@ fn jumble(full_input: &str, found_letters: &str) {
     // Remove underscores from found_letters
     let mut input: String = full_input.to_string();
     for c in found_letters.chars() {
-        if c != '_' {
+        if c != '_' && c != '/' {
             if let Some(pos) = input.find(c) {
                 input.remove(pos);
             } else {
@@ -488,7 +493,11 @@ fn jumble(full_input: &str, found_letters: &str) {
     println!();
     print!("  ");
     for c in found_letters.chars() {
-        print!("{} ", c.to_ascii_uppercase());
+        if c == '/' {
+            print!("  ");
+        } else {
+            print!("{} ", c.to_ascii_uppercase());
+        }
     }
     println!();
 }
