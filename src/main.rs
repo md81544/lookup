@@ -122,6 +122,10 @@ fn main() {
         exit(1);
     }
 
+    // Finally allow "/" as word separators in search string (for consistency with the
+    // "found" argument which has problems with spaces in it (see comments elsewhere)
+    search_string = search_string.replace("/", " ");
+
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
     if args.debug {
         // very small file for testing
@@ -355,10 +359,10 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
                 matched = false;
                 break;
             }
-            if search_string.as_bytes()[i] == 95 {
+            if search_string.as_bytes()[i] == 95 { // i.e. '_'
                 // wildcard (underscore) - we only pass this if the character we're comparing
                 // is not a space (i.e. we wouldn't want "__ _____" to match "AA AA AA")
-                if word.as_bytes()[i] == 32 {
+                if word.as_bytes()[i] == 32 { // i.e. ' '
                     matched = false;
                     break;
                 }

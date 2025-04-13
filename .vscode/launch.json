@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-j", "monansdlan", "-f", "N_ M___ L___"],
+            "args": ["-l", "N_/MA__/L__D"],
             "cwd": "${workspaceFolder}"
         },
         {
