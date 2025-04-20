@@ -29,48 +29,63 @@ struct Args {
     /// "Panagram" search (Telegraph Puzzles). Put the mandatory letter first in the search string.
     #[arg(short, long, default_value_t = false)]
     panagram: bool,
+
     /// "Spelling Bee" search (NYT Puzzles). Put the mandatory letter first in the search string.
     #[arg(short, long, default_value_t = false)]
     spellingbee: bool,
+
     /// "Wordle" search (NYT Puzzles). Use, e.g. k____ to signify K is "green", use -i to include
     /// "yellow" letters, and -x to exclude "grey" letters
     #[arg(short, long, default_value_t = false)]
     wordle: bool,
+
     /// Thesaurus lookup. Can be combined with lookup to filter results: use BOTH -l and -t flags.
-    #[arg(short, long, default_value_t = false)]
-    thesaurus: bool,
+    #[arg(short, long, default_value = "" )]
+    thesaurus: String,
+
     /// Plain anagram solver
     #[arg(short, long, default_value_t = false)]
     anagram: bool,
+
     /// Regex lookup - best single quoted, normally you will need ^/$ at beginning/end
     #[arg(short, long, default_value_t = false)]
     regex: bool,
+
     /// Letters to include ("yellow") for Wordle search
     #[arg(short, long, default_value = "", requires = "wordle")]
     include: String,
+
     /// Letters to exclude ("grey") for Wordle search
     #[arg(short = 'x', long, default_value = "", requires = "wordle")]
     exclude: String,
+
     /// Lookup partial match, e.g. "c_mp_t_r" would yield "computer". You can also look up
     /// phrases, for example "l_k_ m_g_c" would match "like magic".
     #[arg(short, long, default_value_t = false)]
     lookup: bool,
+
     /// Word obscurity level 1 = everyday, 2 = bigger list, 3 = a lot of weird words
     #[arg(short, long, default_value_t = 1)]
     obscurity: u8,
+
     /// Narrow output (one word per line)
     #[arg(short, long, default_value_t = false)]
     narrow: bool,
+
     /// Debug output
     #[arg(short, long, default_value_t = false)]
     debug: bool,
+
     // Search string
     #[arg()]
+
     //#[arg(index(1))]
     search_string: Vec<String>,
+
     /// Jumble letters (for manual anagram solving)
     #[arg(short, long, default_value_t = false)]
     jumble: bool,
+
     /// Found letters confirmed in anagram for jumble, e.g. C_M_P_T_R.
     /// Use '/' for spaces, e.g. 'N_/M_NS/L_ND'
     #[arg(short, long, default_value = "", requires = "jumble")]
@@ -117,7 +132,7 @@ fn main() {
         search_string = args.search_string[0].clone().to_lowercase();
     }
 
-    if search_string.is_empty() {
+    if search_string.is_empty() && args.thesaurus.is_empty() {
         let _ = cmd.print_help();
         exit(1);
     }
@@ -136,7 +151,7 @@ fn main() {
     }
     let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
     let mut word_list: Vec<String> = Vec::new();
-    let mut thesaurus: HashMap<String, Vec<String>> = HashMap::new();
+    let mut thesaurus: Vec<String> = Vec::new();
     let mut lookup_mode = false;
     if phrase_lookup && !args.lookup {
         lookup_mode = true;
@@ -195,23 +210,22 @@ fn main() {
     }
 
     // Also read in thesaurus if required
-    if args.thesaurus {
+    if ! args.thesaurus.is_empty() {
         file_name = "./thesaurus.txt".to_string();
         if let Ok(lines) = read_lines(&file_name) {
             for line in lines.map_while(Result::ok) {
-                let words = line.split(",");
-                let mut first: bool = true;
-                let mut key: String = String::new();
-                let mut synonyms: Vec<String> = Vec::new();
-                for word in words {
-                    if first {
-                        key = word.to_string();
-                        first = false;
-                    } else {
-                        synonyms.push(word.to_string());
+                //if line.starts_with(&(search_string.to_string() + ",")) {
+                if line.starts_with(&(args.thesaurus.to_string() + ",")) {
+                    let words = line.split(",");
+                    let mut first: bool = true;
+                    for word in words {
+                        if first {
+                            first = false;
+                        } else {
+                            thesaurus.push(word.to_string());
+                        }
                     }
                 }
-                thesaurus.insert(key, synonyms);
             }
         }
     }
@@ -242,7 +256,7 @@ fn main() {
     if args.regex {
         action = Action::Regex;
     }
-    if args.thesaurus {
+    if ! args.thesaurus.is_empty() {
         if args.lookup {
             action = Action::LookupWithThesaurus;
         } else {
@@ -288,7 +302,8 @@ fn main() {
     } else if action == Action::Lookup || action == Action::LookupWithThesaurus {
         results = lookup(&search_string, &word_list, "");
         if action == Action::LookupWithThesaurus {
-            println!("TODO: lookup with thesaurus not yet implemented");
+            // we need to remove any words which don't exist in the 'thesaurus' vector
+            results.retain(|item| thesaurus.contains(item));
         }
     } else if action == Action::Regex {
         results = regex_lookup(&search_string, &word_list, "");
@@ -303,7 +318,7 @@ fn main() {
         }
         jumble(&search_string.to_uppercase(), &letters.to_uppercase());
     } else if action == Action::Thesaurus {
-        results = thesaurus_lookup(&search_string, &thesaurus);
+        results = thesaurus;
     }
 
     results.sort();
@@ -359,10 +374,12 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
                 matched = false;
                 break;
             }
-            if search_string.as_bytes()[i] == 95 { // i.e. '_'
+            if search_string.as_bytes()[i] == 95 {
+                // i.e. '_'
                 // wildcard (underscore) - we only pass this if the character we're comparing
                 // is not a space (i.e. we wouldn't want "__ _____" to match "AA AA AA")
-                if word.as_bytes()[i] == 32 { // i.e. ' '
+                if word.as_bytes()[i] == 32 {
+                    // i.e. ' '
                     matched = false;
                     break;
                 }
@@ -378,13 +395,6 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
         }
     }
     results.into_iter().collect()
-}
-
-fn thesaurus_lookup(search_string: &str, thesaurus: &HashMap<String, Vec<String>>) -> Vec<String> {
-    if !thesaurus.contains_key(search_string) {
-        return Vec::new();
-    }
-    return thesaurus.get(search_string).unwrap_or(&Vec::new()).clone();
 }
 
 fn regex_lookup(search_string: &str, word_list: &[String], _exclude: &str) -> Vec<String> {

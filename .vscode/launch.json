@@ -19,7 +19,8 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-l", "N_/MA__/L__D"],
+            //"args": ["-l", "__y__", "-t", "country"],
+            "args": ["-t", "fish"],
             "cwd": "${workspaceFolder}"
         },
         {
