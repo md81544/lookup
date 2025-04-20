@@ -256,14 +256,6 @@ fn main() {
     if args.regex {
         action = Action::Regex;
     }
-    if ! args.thesaurus.is_empty() {
-        if args.lookup {
-            action = Action::LookupWithThesaurus;
-        } else {
-            action = Action::Thesaurus;
-        }
-    }
-
     // If none of the "types" are set then we try to infer which type
     // is required from the input
     if action == Action::Undefined {
@@ -286,6 +278,14 @@ fn main() {
         }
         println!("{}", msg.yellow())
     }
+    if ! args.thesaurus.is_empty() {
+        if action == Action::Lookup {
+            action = Action::LookupWithThesaurus;
+        } else {
+            action = Action::Thesaurus;
+        }
+    }
+
 
     if action == Action::Panagram {
         results = panagram(&search_string, &word_list, &anagrams);
