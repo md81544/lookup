@@ -40,7 +40,7 @@ struct Args {
     wordle: bool,
 
     /// Thesaurus lookup. Can be combined with lookup to filter results: use BOTH -l and -t flags.
-    #[arg(short, long, default_value = "" )]
+    #[arg(short, long, default_value = "")]
     thesaurus: String,
 
     /// Plain anagram solver
@@ -78,7 +78,6 @@ struct Args {
 
     // Search string
     #[arg()]
-
     //#[arg(index(1))]
     search_string: Vec<String>,
 
@@ -210,7 +209,7 @@ fn main() {
     }
 
     // Also read in thesaurus if required
-    if ! args.thesaurus.is_empty() {
+    if !args.thesaurus.is_empty() {
         file_name = "./thesaurus.txt".to_string();
         if let Ok(lines) = read_lines(&file_name) {
             for line in lines.map_while(Result::ok) {
@@ -278,14 +277,13 @@ fn main() {
         }
         println!("{}", msg.yellow())
     }
-    if ! args.thesaurus.is_empty() {
+    if !args.thesaurus.is_empty() {
         if action == Action::Lookup {
             action = Action::LookupWithThesaurus;
         } else {
             action = Action::Thesaurus;
         }
     }
-
 
     if action == Action::Panagram {
         results = panagram(&search_string, &word_list, &anagrams);
