@@ -1,6 +1,6 @@
-* "Regular" letter finder, e.g. displays every odd and even letters in a phrase
-* Thesaurus
-* Combined lookup incorporating thesaurus
+* Add a "comment" flag to refer to clue number, e.g. -c 17d to aid when repeating a
+  lookup via command line search history
+
 * all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
   so it would _probably_ be an optimisation to use bytes instead
 * Wordle: need an easy way to say that a yellow character shouldn't be in a particular position

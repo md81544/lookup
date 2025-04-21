@@ -68,6 +68,10 @@ struct Args {
     #[arg(short, long, default_value_t = 1)]
     obscurity: u8,
 
+    /// Print regular patterns from phrase
+    #[arg(short = 'g', long, default_value_t = false)]
+    regular: bool,
+
     /// Narrow output (one word per line)
     #[arg(short, long, default_value_t = false)]
     narrow: bool,
@@ -103,6 +107,7 @@ enum Action {
     Regex,
     Thesaurus,
     LookupWithThesaurus,
+    RegularPatterns,
 }
 
 fn main() {
@@ -255,6 +260,9 @@ fn main() {
     if args.regex {
         action = Action::Regex;
     }
+    if args.regular {
+        action = Action::RegularPatterns;
+    }
     // If none of the "types" are set then we try to infer which type
     // is required from the input
     if action == Action::Undefined {
@@ -317,6 +325,8 @@ fn main() {
         jumble(&search_string.to_uppercase(), &letters.to_uppercase());
     } else if action == Action::Thesaurus {
         results = thesaurus;
+    } else if action == Action::RegularPatterns {
+        results = regular_patterns(&search_string.to_uppercase());
     }
 
     results.sort();
@@ -404,6 +414,26 @@ fn regex_lookup(search_string: &str, word_list: &[String], _exclude: &str) -> Ve
             results.push(word.to_string());
         }
     }
+    results
+}
+
+fn regular_patterns(search_string: &str) -> Vec<String> {
+    // Just give a selection of regular letters from the search string, e.g.
+    // "BRO SNEERS" could yield "BONES" and "RSER"
+    let mut results: Vec<String> = Vec::new();
+    let mut count = 0;
+    let mut word_evens: String = String::new();
+    let mut word_odds: String = String::new();
+    for c in search_string.chars() {
+        if count % 2 == 0 {
+            word_evens.push(c);
+        }else{
+            word_odds.push(c);
+        }
+        count += 1;
+    }
+    results.push(word_evens);
+    results.push(word_odds);
     results
 }
 
