@@ -25,6 +25,8 @@ use std::process::exit;
         .args(&["wordle", "spellingbee", "panagram", "lookup", "anagram", "jumble"]),
 ))]
 
+// Note, this magic incantation way of defining arguments for clap is called "derive"
+// (see https://docs.rs/clap/latest/clap/_derive/_tutorial/index.html)
 struct Args {
     /// "Panagram" search (Telegraph Puzzles). Put the mandatory letter first in the search string.
     #[arg(short, long, default_value_t = false)]
