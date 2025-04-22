@@ -64,6 +64,10 @@ struct Args {
     #[arg(short, long, default_value_t = false)]
     lookup: bool,
 
+    /// Word size (number of characters)
+    #[arg(short = 'z', long, default_value_t = 0)]
+    size: u8,
+
     /// Word obscurity level 1 = everyday, 2 = bigger list, 3 = a lot of weird words
     #[arg(short, long, default_value_t = 1)]
     obscurity: u8,
@@ -329,9 +333,23 @@ fn main() {
         results = regular_patterns(&search_string.to_uppercase());
     }
 
+    if args.size != 0 {
+        results = remove_wrong_sized_words(&results, args.size);
+    }
+
     results.sort();
     display_results(&results, &search_string, action, args.narrow);
     exit(0);
+}
+
+fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
+    let mut new_results: Vec<String> = Vec::new();
+    for word in results {
+        if word.len() == length.into() {
+            new_results.push(word.to_string());
+        }
+    }
+    new_results
 }
 
 fn display_results(results: &Vec<String>, search_string: &str, action: Action, narrow: bool) {
@@ -427,7 +445,7 @@ fn regular_patterns(search_string: &str) -> Vec<String> {
     for c in search_string.chars() {
         if count % 2 == 0 {
             word_evens.push(c);
-        }else{
+        } else {
             word_odds.push(c);
         }
         count += 1;
