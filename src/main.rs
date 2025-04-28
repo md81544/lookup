@@ -99,7 +99,10 @@ struct Args {
     /// Use '/' for spaces, e.g. 'N_/M_NS/L_ND'
     #[arg(short, long, default_value = "", requires = "jumble")]
     found: String,
-}
+
+    /// Comment (for comments only, does nothing)
+    #[arg(short, long, default_value = "")]
+    comment: String,}
 
 #[derive(Eq, PartialEq)]
 enum Action {
