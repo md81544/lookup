@@ -320,13 +320,18 @@ fn main() {
     } else if action == Action::Regex {
         results = regex_lookup(&search_string, &word_list, "");
     } else if action == Action::Jumble {
-        let letters = args.found.clone();
+        let mut letters = args.found.clone();
         // Note! Clap can't seem to cope with spaces in arguments, even if quoted. So
         // we use '/' in the "found" string to indicate word boundaries, e.g. "N_/M_NS/L_ND"
         let letters_no_spaces: String = letters.replace("/", "");
-        if letters_no_spaces.len() > 0 && letters_no_spaces.len() != search_string.len() {
+        if letters_no_spaces.len() > 0 && letters_no_spaces.len() > search_string.len() {
             println!("Error: 'found' letters must be same length as search string");
             exit(7);
+        }
+        if letters_no_spaces.len() < search_string.len() {
+            for _ in 0..search_string.len() - letters_no_spaces.len() {
+                letters.push('_');
+            }
         }
         jumble(&search_string.to_uppercase(), &letters.to_uppercase());
     } else if action == Action::Thesaurus {
