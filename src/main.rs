@@ -102,7 +102,8 @@ struct Args {
 
     /// Comment (for comments only, does nothing)
     #[arg(short, long, default_value = "")]
-    comment: String,}
+    comment: String,
+}
 
 #[derive(Eq, PartialEq)]
 enum Action {
@@ -116,6 +117,7 @@ enum Action {
     Regex,
     Thesaurus,
     LookupWithThesaurus,
+    RegexWithThesaurus,
     RegularPatterns,
 }
 
@@ -297,6 +299,8 @@ fn main() {
     if !args.thesaurus.is_empty() {
         if action == Action::Lookup {
             action = Action::LookupWithThesaurus;
+        } else if action == Action::Regex {
+            action = Action::RegexWithThesaurus;
         } else {
             action = Action::Thesaurus;
         }
@@ -322,6 +326,8 @@ fn main() {
         }
     } else if action == Action::Regex {
         results = regex_lookup(&search_string, &word_list, "");
+    } else if action == Action::RegexWithThesaurus {
+        results = regex_lookup(&search_string, &thesaurus, "");
     } else if action == Action::Jumble {
         let mut letters = args.found.clone();
         // Note! Clap can't seem to cope with spaces in arguments, even if quoted. So
