@@ -32690,6 +32690,7 @@ jump start
 jump suit
 jump the gun
 jump the queue
+jump the shark
 jump through hoops
 jump to a conclusion
 jump to attention
