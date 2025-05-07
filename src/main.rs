@@ -74,6 +74,10 @@ struct Args {
     #[arg(short, long, default_value_t = 1)]
     obscurity: u8,
 
+    /// Reverse string (useful for reverse 'in' clues)
+    #[arg(short = 'v', long, default_value_t = false)]
+    reverse: bool,
+
     /// Print regular patterns from phrase
     #[arg(short = 'g', long, default_value_t = false)]
     regular: bool,
@@ -119,6 +123,7 @@ enum Action {
     LookupWithThesaurus,
     RegexWithThesaurus,
     RegularPatterns,
+    Reverse
 }
 
 fn main() {
@@ -274,6 +279,9 @@ fn main() {
     if args.regular {
         action = Action::RegularPatterns;
     }
+    if args.reverse {
+        action = Action::Reverse;
+    }
     // If none of the "types" are set then we try to infer which type
     // is required from the input
     if action == Action::Undefined && args.thesaurus.is_empty() {
@@ -347,6 +355,8 @@ fn main() {
         results = thesaurus;
     } else if action == Action::RegularPatterns {
         results = regular_patterns(&search_string.to_uppercase());
+    } else if action == Action::Reverse {
+        results = reverse(&search_string.to_uppercase());
     }
 
     if args.size != 0 {
@@ -468,6 +478,15 @@ fn regular_patterns(search_string: &str) -> Vec<String> {
     }
     results.push(word_evens);
     results.push(word_odds);
+    results
+}
+
+fn reverse(search_string: &str) -> Vec<String> {
+    // Just reverse the search string... useful for reverse 'in' clues, for example
+    // "BEER IFFY" would print "YFFIREEB" from which the answer might be "FIRE"
+    let mut results: Vec<String> = Vec::new();
+    let word = search_string.chars().rev().collect::<String>();
+    results.push(word);
     results
 }
 
