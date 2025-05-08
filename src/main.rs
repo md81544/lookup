@@ -276,11 +276,15 @@ fn main() {
     if args.regex {
         action = Action::Regex;
     }
-    if args.regular {
+    if args.regular && args.reverse {
         action = Action::RegularPatterns;
-    }
-    if args.reverse {
-        action = Action::Reverse;
+    } else {
+        if args.regular {
+            action = Action::RegularPatterns;
+        }
+        if args.reverse {
+            action = Action::Reverse;
+        }
     }
     // If none of the "types" are set then we try to infer which type
     // is required from the input
@@ -362,7 +366,7 @@ fn main() {
     } else if action == Action::Thesaurus {
         results = thesaurus;
     } else if action == Action::RegularPatterns {
-        results = regular_patterns(&search_string.to_uppercase());
+        results = regular_patterns(&search_string.to_uppercase(), args.reverse);
     } else if action == Action::Reverse {
         results = reverse(&search_string.to_uppercase());
     }
@@ -469,14 +473,20 @@ fn regex_lookup(search_string: &str, word_list: &[String], _exclude: &str) -> Ve
     results
 }
 
-fn regular_patterns(search_string: &str) -> Vec<String> {
+fn regular_patterns(search_string: &str, reverse: bool) -> Vec<String> {
     // Just give a selection of regular letters from the search string, e.g.
     // "BRO SNEERS" could yield "BONES" and "RSER"
+    // If the reverse flag is specified we do it in reverse
+    let mut word: String;
+    word = search_string.to_string();
+    if reverse {
+        word = word.chars().rev().collect();
+    }
     let mut results: Vec<String> = Vec::new();
     let mut count = 0;
     let mut word_evens: String = String::new();
     let mut word_odds: String = String::new();
-    for c in search_string.chars() {
+    for c in word.chars() {
         if count % 2 == 0 {
             word_evens.push(c);
         } else {
