@@ -1,3 +1,4 @@
+* Should be able to combine reverse and regular flags to get backwards intermittent 'in' clues
 * ? Add a wildcard option to match the rest of a lookup e.g. -l B% -z 4 might match "bird" ?
 
 * all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
