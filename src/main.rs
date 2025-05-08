@@ -101,7 +101,7 @@ struct Args {
 
     /// Found letters confirmed in anagram for jumble, e.g. C_M_P_T_R.
     /// Use '/' for spaces, e.g. 'N_/M_NS/L_ND'
-    #[arg(short, long, default_value = "", requires = "jumble")]
+    #[arg(short, long, default_value = "")]
     found: String,
 
     /// Comment (for comments only, does nothing)
@@ -298,6 +298,8 @@ fn main() {
         } else if search_string.len() == 7 {
             action = Action::Spellingbee;
             msg += "Spelling Bee";
+        } else if args.found.len() > 0 {
+            action = Action::Jumble;
         } else {
             action = Action::Anagram;
             msg += "anagram";
