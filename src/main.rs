@@ -284,7 +284,7 @@ fn main() {
     }
     // If none of the "types" are set then we try to infer which type
     // is required from the input
-    if action == Action::Undefined && args.thesaurus.is_empty() {
+    if action == Action::Undefined {
         let mut msg = String::from("No game type specified, assuming ");
         if lookup_mode || search_string.contains('_') {
             action = Action::Lookup;
@@ -302,7 +302,9 @@ fn main() {
             action = Action::Anagram;
             msg += "anagram";
         }
-        println!("{}", msg.yellow())
+        if args.thesaurus.is_empty() {
+            println!("{}", msg.yellow())
+        }
     }
     if !args.thesaurus.is_empty() {
         if action == Action::Lookup {
