@@ -123,7 +123,7 @@ enum Action {
     LookupWithThesaurus,
     RegexWithThesaurus,
     RegularPatterns,
-    Reverse
+    Reverse,
 }
 
 fn main() {
@@ -350,7 +350,11 @@ fn main() {
                 letters.push('_');
             }
         }
-        jumble(&search_string.to_uppercase(), &letters.to_uppercase());
+        jumble(
+            &search_string.to_uppercase(),
+            &letters.to_uppercase(),
+            args.size,
+        );
     } else if action == Action::Thesaurus {
         results = thesaurus;
     } else if action == Action::RegularPatterns {
@@ -537,7 +541,14 @@ fn panagram(
     results
 }
 
-fn jumble(full_input: &str, found_letters: &str) {
+fn jumble(full_input: &str, found_letters: &str, size: u8) {
+    if size > 0 && size as usize != full_input.len() {
+        println!(
+            "Error: the number of supplied letters ({}) did not match the 'size' argument",
+            full_input.len()
+        );
+        return;
+    }
     // Remove underscores from found_letters
     let mut input: String = full_input.to_string();
     for c in found_letters.chars() {
