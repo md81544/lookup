@@ -12,6 +12,18 @@ pub mod display {
         }
     }
 
+    fn word_is_anagram(word: &str, search_string: &str) -> bool {
+        if word.len() < 7 {
+            return false;
+        }
+        for c in search_string.chars() {
+            if !word.contains(c) {
+                return false;
+            }
+        }
+        true
+    }
+
     pub fn show_results(
         results: &Vec<String>,
         search_string: &str,
@@ -23,7 +35,7 @@ pub mod display {
                 print!("'");
             }
             if (action == Action::Panagram && word.len() == 9)
-                || (action == Action::Spellingbee && crate::word_is_pangram(word, search_string))
+                || (action == Action::Spellingbee && word_is_anagram(word, search_string))
             {
                 print!("{}", word.to_uppercase().bold());
             } else {

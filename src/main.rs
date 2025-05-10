@@ -392,18 +392,6 @@ fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
     new_results
 }
 
-fn word_is_pangram(word: &str, search_string: &str) -> bool {
-    if word.len() < 7 {
-        return false;
-    }
-    for c in search_string.chars() {
-        if !word.contains(c) {
-            return false;
-        }
-    }
-    true
-}
-
 fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<String> {
     let mut results: HashSet<String> = HashSet::new();
     for word in word_list {
