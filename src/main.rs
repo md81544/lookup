@@ -13,6 +13,8 @@ use std::io::{self, BufRead};
 use std::path::Path;
 use std::process::exit;
 
+pub mod ui;
+
 // Note, word lists are generated from public domain word lists,
 // see http://wordlist.aspell.net/12dicts-readme/
 
@@ -110,7 +112,7 @@ struct Args {
 }
 
 #[derive(Eq, PartialEq)]
-enum Action {
+pub enum Action {
     Undefined,
     Wordle,
     Spellingbee,
@@ -376,7 +378,7 @@ fn main() {
     }
 
     results.sort();
-    display_results(&results, &search_string, action, args.narrow);
+    ui::display::show_results(&results, &search_string, action, args.narrow);
     exit(0);
 }
 
@@ -388,26 +390,6 @@ fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
         }
     }
     new_results
-}
-
-fn display_results(results: &Vec<String>, search_string: &str, action: Action, narrow: bool) {
-    for word in results {
-        if word.contains(char::is_whitespace) && !narrow {
-            print!("'");
-        }
-        if (action == Action::Panagram && word.len() == 9)
-            || (action == Action::Spellingbee && word_is_pangram(word, search_string))
-        {
-            print!("{}", word.to_uppercase().bold());
-        } else {
-            print!("{}", word);
-        }
-        if word.contains(char::is_whitespace) && !narrow {
-            print!("'");
-        }
-        print_separator(narrow);
-    }
-    println!();
 }
 
 fn word_is_pangram(word: &str, search_string: &str) -> bool {
@@ -713,14 +695,6 @@ fn check_yellow_letters_exist(w: &str, search_string: &str, yellow_letters: &str
         }
     }
     true
-}
-
-fn print_separator(narrow: bool) {
-    if narrow {
-        println!();
-    } else {
-        print!(" ");
-    }
 }
 
 fn read_lines<P>(filename: &P) -> io::Result<io::Lines<io::BufReader<File>>>
