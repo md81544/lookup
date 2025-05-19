@@ -106,8 +106,8 @@ struct Args {
     #[arg(short, long, default_value = "")]
     found: String,
 
-    /// Comment (for comments only, does nothing)
-    #[arg(short, long, default_value = "")]
+    /// Comment (for comments only, does nothing) NOTE! Needs to be last parameter
+    #[arg(short, long, default_value = "", num_args = 1..)]
     comment: String,
 }
 

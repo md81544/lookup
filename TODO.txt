@@ -1,3 +1,5 @@
+* Allow -f with -a
+
 * Seems to be a bug in the 'jumble' option if twenty letters (or more?)  are added - the letter circle appears misshapen
 
 * Option to avoid phrase lookup in, say, regex
