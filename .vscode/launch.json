@@ -20,7 +20,8 @@
                 }
             },
             //"args": ["-l", "__y__", "-t", "country"],
-            "args": ["-t", "fish"],
+            //"args": ["-t", "fish"],
+            "args": ["pocmutre", "-a", "-f", "c_______"],
             "cwd": "${workspaceFolder}"
         },
         {

@@ -386,9 +386,36 @@ fn main() {
         results = remove_wrong_sized_words(&results, args.size);
     }
 
+    if args.found.len() > 0 {
+        results = remove_found_mismatches(&results, args.found);
+    }
+
     results.sort();
     ui::display::show_results(&results, &search_string, action, args.narrow);
     exit(0);
+}
+
+fn remove_found_mismatches(results: &[String], found: String) -> Vec<String> {
+    let mut new_results: Vec<String> = Vec::new();
+    let mut regex_string = "^".to_string();
+    for i in 0..found.len() {
+        if found.as_bytes()[i] == '_' as u8 {
+            regex_string.push_str(".");
+        } else if found.as_bytes()[i] == '%' as u8 {
+            regex_string.push_str(".*");
+            break;
+        }else{
+            regex_string.push_str(&(found.as_bytes()[i] as char).to_string());
+        }
+    }
+    regex_string.push_str("$");
+    let re = Regex::new(&regex_string).unwrap();
+    for word in results {
+        if re.is_match(word) {
+            new_results.push(word.to_string());
+        }
+    }
+    new_results
 }
 
 fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
