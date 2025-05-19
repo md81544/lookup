@@ -1,17 +1,6 @@
 * Allow -f with -a
 
-* Seems to be a bug in the 'jumble' option if twenty letters (or more?)  are added - the letter circle appears misshapen
-
 * Option to avoid phrase lookup in, say, regex
-
-* ? Add a wildcard option to match the rest of a lookup e.g. -l B% -z 4 might match "bird" ?
 
 * all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
   so it would _probably_ be an optimisation to use bytes instead
-* Wordle: need an easy way to say that a yellow character shouldn't be in a particular position
-  (best idea so far is to be able to enter multiple "goes" where the user enters letters
-  that were yellow, e.g. if I guessed "oaten" and the result was green "O" and yellow "T",
-  the user could enter "-g O_t__" perhaps? (note upper/lower case)
-* Wordle: might be an idea to order results by most common letters?
-* (To think about) - maybe some way of marking off words tried in 'panagram' - perhaps
-  an interface where the words disappear when selected? Curses?

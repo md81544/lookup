@@ -288,6 +288,9 @@ fn main() {
             action = Action::Reverse;
         }
     }
+    if search_string.contains('%') {
+        action = Action::Lookup;
+    }
     // If none of the "types" are set then we try to infer which type
     // is required from the input
     if action == Action::Undefined {
@@ -337,6 +340,12 @@ fn main() {
     } else if action == Action::Anagram {
         results = anagram_search(&search_string, &word_list, &anagrams);
     } else if action == Action::Lookup || action == Action::LookupWithThesaurus {
+        if search_string.contains('%') {
+            if search_string.find('%') != Some(search_string.len() - 1) {
+                println!("Error: '%' wildcard must only be used at end of search string");
+                exit(8);
+            }
+        }
         results = lookup(&search_string, &word_list, "");
         if action == Action::LookupWithThesaurus {
             // we need to remove any words which don't exist in the 'thesaurus' vector
@@ -396,7 +405,7 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
     let mut results: HashSet<String> = HashSet::new();
     for word in word_list {
         let mut matched = true;
-        if word.len() != search_string.len() {
+        if word.len() != search_string.len() && !search_string.contains('%') {
             continue;
         }
         for i in 0..word.len() {
@@ -408,8 +417,7 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
                 matched = false;
                 break;
             }
-            if search_string.as_bytes()[i] == 95 {
-                // i.e. '_'
+            if search_string.as_bytes()[i] == '_' as u8 {
                 // wildcard (underscore) - we only pass this if the character we're comparing
                 // is not a space (i.e. we wouldn't want "__ _____" to match "AA AA AA")
                 if word.as_bytes()[i] == 32 {
@@ -418,6 +426,10 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
                     break;
                 }
                 continue;
+            }
+            if search_string.as_bytes()[i] == '%' as u8 {
+                // match any word past this point
+                break;
             }
             if search_string.as_bytes()[i] != word.as_bytes()[i] {
                 matched = false;
