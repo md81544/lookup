@@ -404,11 +404,13 @@ fn remove_found_mismatches(results: &[String], found: String) -> Vec<String> {
         } else if found.as_bytes()[i] == '%' as u8 {
             regex_string.push_str(".*");
             break;
-        }else{
+        } else {
             regex_string.push_str(&(found.as_bytes()[i] as char).to_string());
         }
     }
-    regex_string.push_str("$");
+    if !regex_string.contains(".*") {
+        regex_string.push_str(".*");
+    }
     let re = Regex::new(&regex_string).unwrap();
     for word in results {
         if re.is_match(word) {
