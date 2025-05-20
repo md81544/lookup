@@ -28,5 +28,7 @@ answer (in this case, "Brandenbug Gate"):
 
       B _ A _ _ _ _ _ _ _ G   _ _ _ E
 
+The optional `-f` flag there allows you to specify the letters you've already found.
+
 There are many other options, including regex searches if you understand them.
 Type `lookup -h` to see what's available.
