@@ -73,7 +73,7 @@ struct Args {
     size: u8,
 
     /// Word obscurity level 1 = everyday, 2 = bigger list, 3 = a lot of weird words
-    #[arg(short, long, default_value_t = 1)]
+    #[arg(short, long, default_value_t = 3)]
     obscurity: u8,
 
     /// Reverse string (useful for reverse 'in' clues)
