@@ -101,6 +101,10 @@ struct Args {
     #[arg(short, long, default_value_t = false)]
     jumble: bool,
 
+    /// Exclude phrases in results (single words only)
+    #[arg(short, long, default_value_t = false)]
+    excludephrases: bool,
+
     /// Found letters confirmed in anagram for jumble, e.g. C_M_P_T_R.
     /// Use '/' for spaces, e.g. 'N_/M_NS/L_ND'
     #[arg(short, long, default_value = "")]
@@ -210,25 +214,28 @@ fn main() {
     }
 
     // Also add phrases to the anagram list
-    file_name = "./phrases.txt".to_string();
-    if let Ok(lines) = read_lines(&file_name) {
-        for word in lines.map_while(Result::ok) {
-            word_list.push(word.clone());
-            let anagram = sort_word(&word);
-            // Does this entry already exist? Add to vec if so, else create new vec
-            match anagrams.entry(anagram) {
-                Entry::Vacant(e) => {
-                    e.insert(vec![vec_index]);
+
+    if !args.excludephrases {
+        file_name = "./phrases.txt".to_string();
+        if let Ok(lines) = read_lines(&file_name) {
+            for word in lines.map_while(Result::ok) {
+                word_list.push(word.clone());
+                let anagram = sort_word(&word);
+                // Does this entry already exist? Add to vec if so, else create new vec
+                match anagrams.entry(anagram) {
+                    Entry::Vacant(e) => {
+                        e.insert(vec![vec_index]);
+                    }
+                    Entry::Occupied(mut e) => {
+                        e.get_mut().push(vec_index);
+                    }
                 }
-                Entry::Occupied(mut e) => {
-                    e.get_mut().push(vec_index);
-                }
+                vec_index += 1;
             }
-            vec_index += 1;
+        } else {
+            println!("Could not read {}", file_name);
+            exit(2);
         }
-    } else {
-        println!("Could not read {}", file_name);
-        exit(2);
     }
 
     // Also read in thesaurus if required

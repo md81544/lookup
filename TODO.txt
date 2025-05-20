@@ -1,4 +1,2 @@
-* Option to avoid phrase lookup in, say, regex
-
 * all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
   so it would _probably_ be an optimisation to use bytes instead
