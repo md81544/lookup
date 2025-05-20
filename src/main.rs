@@ -397,7 +397,7 @@ fn main() {
 
 fn remove_found_mismatches(results: &[String], found: String) -> Vec<String> {
     let mut new_results: Vec<String> = Vec::new();
-    let mut regex_string = "^".to_string();
+    let mut regex_string = "(?i)^".to_string();
     for i in 0..found.len() {
         if found.as_bytes()[i] == '_' as u8 {
             regex_string.push_str(".");
