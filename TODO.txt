@@ -1,5 +1,3 @@
-* Why does "howeeriewhysure -z15" not produce any results, but "lu howeeriewhysure -a" does?
-
 * List words found as substrings of -g or -r (and maybe a new option to find substring words in a long string? E.g. "birthaim" could return "thai"
 
 * all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout

@@ -20,9 +20,10 @@
                 }
             },
             //"args": ["-l", "__y__", "-t", "country"],
-            "args": ["-t", "fish"],
+            //"args": ["-t", "fish"],
             //"args": ["pocmutre", "-a", "-f", "c_______"],
             //"args": ["-t", "pressing", "-f", "_R_E_T"],
+            "args": ["howeeriewhysure", "-z15"],
             "cwd": "${workspaceFolder}"
         },
         {

@@ -415,7 +415,9 @@ fn remove_found_mismatches(results: &[String], found: String) -> Vec<String> {
 fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
     let mut new_results: Vec<String> = Vec::new();
     for word in results {
-        if word.len() == length.into() {
+        let mut w = word.clone();
+        w.retain(|c| !c.is_whitespace());
+        if w.len() == length.into() {
             new_results.push(word.to_string());
         }
     }
