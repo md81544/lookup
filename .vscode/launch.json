@@ -23,7 +23,7 @@
             //"args": ["-t", "fish"],
             //"args": ["pocmutre", "-a", "-f", "c_______"],
             //"args": ["-t", "pressing", "-f", "_R_E_T"],
-            "args": ["howeeriewhysure", "-z15"],
+            "args": ["etona", "-w"],
             "cwd": "${workspaceFolder}"
         },
         {

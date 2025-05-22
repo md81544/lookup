@@ -4,13 +4,9 @@ use itertools::Itertools;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use regex::Regex;
-use std::collections::hash_map::Entry;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::f32::consts::PI;
-use std::fs::File;
-use std::io::{self, BufRead};
-use std::path::Path;
 use std::process::exit;
 
 pub mod file;
@@ -185,58 +181,18 @@ fn main() {
     }
 
     // Word list file must exist in the current path
-    let mut vec_index = 0usize;
-    if let Ok(lines) = read_lines(&file_name) {
-        for word in lines.map_while(Result::ok) {
-            if args.wordle {
-                // if we're doing a wordle lookup, we're only interested in five-letter words
-                // and we don't care about anagrams
-                if word.len() == 5 {
-                    word_list.push(word.clone());
-                }
-            } else {
-                word_list.push(word.clone());
-                let anagram = sort_word(&word);
-                // Does this entry already exist? Add to vec if so, else create new vec
-                match anagrams.entry(anagram) {
-                    Entry::Vacant(e) => {
-                        e.insert(vec![vec_index]);
-                    }
-                    Entry::Occupied(mut e) => {
-                        e.get_mut().push(vec_index);
-                    }
-                }
-                vec_index += 1;
-            }
-        }
+    let mut vec_index: usize = 0usize;
+    if args.wordle {
+        file::load::wordle(&mut word_list, &file_name);
     } else {
-        println!("Could not read {}", file_name);
-        exit(2);
+        file::load::full_list(&mut word_list, &mut anagrams, &file_name, &mut vec_index);
     }
 
     // Also add phrases to the anagram list
 
     if !args.excludephrases {
         file_name = "./phrases.txt".to_string();
-        if let Ok(lines) = read_lines(&file_name) {
-            for word in lines.map_while(Result::ok) {
-                word_list.push(word.clone());
-                let anagram = sort_word(&word);
-                // Does this entry already exist? Add to vec if so, else create new vec
-                match anagrams.entry(anagram) {
-                    Entry::Vacant(e) => {
-                        e.insert(vec![vec_index]);
-                    }
-                    Entry::Occupied(mut e) => {
-                        e.get_mut().push(vec_index);
-                    }
-                }
-                vec_index += 1;
-            }
-        } else {
-            println!("Could not read {}", file_name);
-            exit(2);
-        }
+        file::load::full_list(&mut word_list, &mut anagrams, &file_name, &mut vec_index);
     }
 
     // Also read in thesaurus if required
@@ -718,14 +674,6 @@ fn check_yellow_letters_exist(w: &str, search_string: &str, yellow_letters: &str
         }
     }
     true
-}
-
-fn read_lines<P>(filename: &P) -> io::Result<io::Lines<io::BufReader<File>>>
-where
-    P: AsRef<Path>,
-{
-    let file = File::open(filename)?;
-    Ok(io::BufReader::new(file).lines())
 }
 
 fn sort_word(word: &str) -> String {
