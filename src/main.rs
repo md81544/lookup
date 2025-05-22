@@ -13,6 +13,7 @@ use std::io::{self, BufRead};
 use std::path::Path;
 use std::process::exit;
 
+pub mod file;
 pub mod ui;
 
 // Note, word lists are generated from public domain word lists,
@@ -166,6 +167,7 @@ fn main() {
     // Finally allow "/" as word separators in search string (for consistency with the
     // "found" argument which has problems with spaces in it (see comments elsewhere)
     search_string = search_string.replace("/", " ");
+    println!("{}", search_string);
 
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
     if args.debug {
@@ -240,23 +242,7 @@ fn main() {
 
     // Also read in thesaurus if required
     if !args.thesaurus.is_empty() {
-        file_name = "./thesaurus.txt".to_string();
-        if let Ok(lines) = read_lines(&file_name) {
-            for line in lines.map_while(Result::ok) {
-                //if line.starts_with(&(search_string.to_string() + ",")) {
-                if line.starts_with(&(args.thesaurus.to_string() + ",")) {
-                    let words = line.split(",");
-                    let mut first: bool = true;
-                    for word in words {
-                        if first {
-                            first = false;
-                        } else {
-                            thesaurus.push(word.to_string());
-                        }
-                    }
-                }
-            }
-        }
+        file::load::thesaurus(&mut thesaurus, &(args.thesaurus.to_string()));
     }
 
     let mut results: Vec<String> = Vec::new();
