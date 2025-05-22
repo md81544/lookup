@@ -167,7 +167,6 @@ fn main() {
     // Finally allow "/" as word separators in search string (for consistency with the
     // "found" argument which has problems with spaces in it (see comments elsewhere)
     search_string = search_string.replace("/", " ");
-    println!("{}", search_string);
 
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
     if args.debug {
