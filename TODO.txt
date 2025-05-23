@@ -1,3 +1,6 @@
+* Allow -f with -r to find words in "in" clues... for example
+  -v aldershotcafedemolition -f __/__c__ should return "de facto"
+
 * List words found as substrings of -g or -r (and maybe a new option to find substring words in a long string? E.g. "birthaim" could return "thai"
 
 * all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
