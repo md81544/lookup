@@ -356,6 +356,8 @@ fn remove_found_mismatches(results: &[String], found: String) -> Vec<String> {
         } else if found.as_bytes()[i] == '%' as u8 {
             regex_string.push_str(".*");
             break;
+        } else if found.as_bytes()[i] == '/' as u8 {
+            regex_string.push_str(" ");
         } else {
             regex_string.push_str(&(found.as_bytes()[i] as char).to_string());
         }
