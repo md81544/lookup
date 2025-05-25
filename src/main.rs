@@ -188,13 +188,6 @@ fn main() {
         file::load::full_list(&mut word_list, &mut anagrams, &file_name, &mut vec_index);
     }
 
-    // Also add phrases to the anagram list
-
-    if !args.excludephrases {
-        file_name = "./phrases.txt".to_string();
-        file::load::full_list(&mut word_list, &mut anagrams, &file_name, &mut vec_index);
-    }
-
     // Also read in thesaurus if required
     if !args.thesaurus.is_empty() {
         file::load::thesaurus(&mut thesaurus, &(args.thesaurus.to_string()));
@@ -273,6 +266,17 @@ fn main() {
         } else {
             action = Action::Thesaurus;
         }
+    }
+
+    // Also add phrases to the word list
+    // unless excluded or game type is wordle, spellingbee, or panagram
+    if !args.excludephrases
+        && action != Action::Spellingbee
+        && action != Action::Panagram
+        && action != Action::Wordle
+    {
+        file_name = "./phrases.txt".to_string();
+        file::load::full_list(&mut word_list, &mut anagrams, &file_name, &mut vec_index);
     }
 
     if action == Action::Panagram {
