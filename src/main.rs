@@ -21,7 +21,7 @@ pub mod ui;
 #[clap(group(
     ArgGroup::new("lookups")
         .required(false)
-        .args(&["wordle", "spellingbee", "panagram", "lookup", "anagram", "jumble"]),
+        .args(&["wordle", "spellingbee", "panagram", "lookup", "jumble"]),
 ))]
 
 // Note, this magic incantation way of defining arguments for clap is called "derive"
@@ -214,9 +214,6 @@ fn main() {
     if args.wordle {
         action = Action::Wordle;
     }
-    if args.anagram {
-        action = Action::Anagram;
-    }
     if args.lookup {
         action = Action::Lookup;
     }
@@ -235,6 +232,9 @@ fn main() {
         if args.reverse {
             action = Action::Reverse;
         }
+    }
+    if args.anagram {
+        action = Action::Anagram;
     }
     if search_string.contains('%') {
         action = Action::Lookup;
