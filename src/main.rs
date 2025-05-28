@@ -86,7 +86,7 @@ struct Args {
     narrow: bool,
 
     /// Debug output
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short = 'D', long, default_value_t = false)]
     debug: bool,
 
     // Search string
@@ -270,7 +270,7 @@ fn main() {
 
     // Also add phrases to the word list
     // unless excluded or game type is wordle, spellingbee, or panagram
-    if !args.excludephrases
+    if !args.excludephrases && !args.debug
         && action != Action::Spellingbee
         && action != Action::Panagram
         && action != Action::Wordle
