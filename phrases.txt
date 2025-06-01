@@ -4990,6 +4990,7 @@ backup copy
 backward compatible
 backward flip
 backward point
+backward roll
 backward square
 backward square leg
 backward step
