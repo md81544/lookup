@@ -1,5 +1,3 @@
-* -e (exclude phrases) doesn't work in 'lu -t cut -f _h__ -e
-
 * Provide definition of a word (see https://github.com/wordset/wordset-dictionary)
 
 * Allow -f with -r to find words in "in" clues... for example

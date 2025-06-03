@@ -340,7 +340,7 @@ fn main() {
     }
 
     if args.found.len() > 0 {
-        results = remove_found_mismatches(&results, args.found);
+        results = remove_found_mismatches(&results, args.found, args.excludephrases);
     }
 
     results.sort();
@@ -348,7 +348,11 @@ fn main() {
     exit(0);
 }
 
-fn remove_found_mismatches(results: &[String], found: String) -> Vec<String> {
+fn remove_found_mismatches(
+    results: &[String],
+    found: String,
+    exclude_phrases: bool,
+) -> Vec<String> {
     let mut new_results: Vec<String> = Vec::new();
     let mut regex_string = "(?i)^".to_string();
     for i in 0..found.len() {
@@ -368,6 +372,9 @@ fn remove_found_mismatches(results: &[String], found: String) -> Vec<String> {
     }
     let re = Regex::new(&regex_string).unwrap();
     for word in results {
+        if exclude_phrases && word.contains(' ') {
+            continue;
+        }
         if re.is_match(word) {
             new_results.push(word.to_string());
         }
