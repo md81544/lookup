@@ -236,7 +236,7 @@ fn main() {
     // is required from the input
     if action == Action::Undefined {
         let mut msg = String::from("No game type specified, assuming ");
-        if lookup_mode || search_string.contains('_') {
+        if lookup_mode || search_string.contains('_') || search_string.contains('.') {
             action = Action::Lookup;
             msg += "lookup";
         } else if search_string.len() == 5 {
@@ -270,7 +270,8 @@ fn main() {
 
     // Also add phrases to the word list
     // unless excluded or game type is wordle, spellingbee, or panagram
-    if !args.excludephrases && !args.debug
+    if !args.excludephrases
+        && !args.debug
         && action != Action::Spellingbee
         && action != Action::Panagram
         && action != Action::Wordle
@@ -402,8 +403,9 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
                 matched = false;
                 break;
             }
-            if search_string.as_bytes()[i] == '_' as u8 {
-                // wildcard (underscore) - we only pass this if the character we're comparing
+            if search_string.as_bytes()[i] == '_' as u8 || search_string.as_bytes()[i] == '.' as u8
+            {
+                // wildcard - we only pass this if the character we're comparing
                 // is not a space (i.e. we wouldn't want "__ _____" to match "AA AA AA")
                 if word.as_bytes()[i] == 32 {
                     // i.e. ' '
@@ -533,7 +535,7 @@ fn jumble(full_input: &str, found_letters: &str, size: u8) {
     // Remove underscores from found_letters
     let mut input: String = full_input.to_string();
     for c in found_letters.chars() {
-        if c != '_' && c != '/' {
+        if c != '_' && c != '/' && c != '.' {
             if let Some(pos) = input.find(c) {
                 input.remove(pos);
             } else {
