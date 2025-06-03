@@ -584,6 +584,8 @@ fn jumble(full_input: &str, found_letters: &str, size: u8) {
     for c in found_letters.chars() {
         if c == '/' {
             print!("  ");
+        } else if c == '.' {
+            print!("_ ");
         } else {
             print!("{} ", c.to_ascii_uppercase());
         }
