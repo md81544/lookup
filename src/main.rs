@@ -239,20 +239,9 @@ fn main() {
         if lookup_mode || search_string.contains('_') || search_string.contains('.') {
             action = Action::Lookup;
             msg += "lookup";
-        } else if search_string.len() == 5 {
-            action = Action::Wordle;
-            msg += "Wordle";
-        } else if search_string.len() == 9 {
-            action = Action::Panagram;
-            msg += "Panagram";
-        } else if search_string.len() == 7 {
-            action = Action::Spellingbee;
-            msg += "Spelling Bee";
-        } else if args.found.len() > 0 {
-            action = Action::Jumble;
         } else {
-            action = Action::Anagram;
-            msg += "anagram";
+            action = Action::Jumble;
+            msg += "lookup";
         }
         if args.thesaurus.is_empty() {
             println!("{}", msg.yellow())
