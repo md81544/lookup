@@ -241,7 +241,7 @@ fn main() {
             msg += "lookup";
         } else {
             action = Action::Jumble;
-            msg += "lookup";
+            msg += "jumble";
         }
         if args.thesaurus.is_empty() {
             println!("{}", msg.yellow())
