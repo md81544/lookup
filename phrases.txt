@@ -28524,6 +28524,7 @@ hit a bad patch
 hit a brick wall
 hit a bum note
 hit a dead end
+hit a false note
 hit a four
 hit a home run
 hit a raw nerve
