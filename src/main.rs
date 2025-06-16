@@ -49,7 +49,7 @@ struct Args {
     anagram: bool,
 
     /// Regex lookup - best single quoted, normally you will need ^/$ at beginning/end
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short = 'R', long, default_value_t = false)]
     regex: bool,
 
     /// Letters to include ("yellow") for Wordle search
@@ -110,6 +110,10 @@ struct Args {
     /// Comment (for comments only, does nothing)
     #[arg(short, long, default_value = "", num_args = 1..)]
     comment: String,
+
+    /// Remove letters interactively
+    #[arg(short, long, default_value_t = false)]
+    remove: bool,
 }
 
 #[derive(Eq, PartialEq)]
@@ -127,6 +131,7 @@ pub enum Action {
     RegexWithThesaurus,
     RegularPatterns,
     Reverse,
+    Remove,
 }
 
 fn main() {
@@ -178,6 +183,11 @@ fn main() {
     let mut lookup_mode = false;
     if phrase_lookup && !args.lookup {
         lookup_mode = true;
+    }
+
+    if args.remove {
+        interactive_remove(search_string);
+        exit(0);
     }
 
     // Word list file must exist in the current path
@@ -335,6 +345,49 @@ fn main() {
     results.sort();
     ui::display::show_results(&results, &search_string, action, args.narrow);
     exit(0);
+}
+
+fn interactive_remove(search_string: String) {
+    use crossterm::{
+        cursor::MoveToColumn,
+        event::{self, Event, KeyCode, KeyEvent},
+        execute,
+        style::Print,
+        terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
+    };
+    use std::io::stdout;
+    let mut s = search_string.to_uppercase().clone();
+    enable_raw_mode().unwrap();
+    let mut stdout = stdout();
+    println!("Press Esc to exit");
+    loop {
+        if s.is_empty() {
+            break;
+        }
+        execute!(
+            stdout,
+            MoveToColumn(0),
+            Clear(ClearType::CurrentLine),
+            Print(format!("{} ", s))
+        )
+        .unwrap();
+        if let Event::Key(KeyEvent { code, .. }) = event::read().unwrap() {
+            if code == KeyCode::Esc {
+                println!("");
+                break;
+            }
+            let c = code.as_char();
+            if ! c.is_none() {
+                let c = code.as_char().unwrap().to_ascii_uppercase();
+                if let Some(pos) = s.find(c) {
+                    s.remove(pos);
+                }
+            }
+        }
+    }
+    execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
+    disable_raw_mode().unwrap();
+    println!("");
 }
 
 fn remove_found_mismatches(
