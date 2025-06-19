@@ -166,8 +166,10 @@ fn main() {
     }
 
     // Finally allow "/" as word separators in search string (for consistency with the
-    // "found" argument which has problems with spaces in it (see comments elsewhere)
-    search_string = search_string.replace("/", " ");
+    // "found" argument which has problems with spaces in it (see comments elsewhere).
+    // We also allow numbers in the search string, these represent the number of "blanks".
+    // so for example -f 3f7 would result in "...f......."
+    search_string = process_search_string(&search_string);
 
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
     if args.debug {
@@ -309,6 +311,7 @@ fn main() {
         results = regex_lookup(&search_string, &thesaurus, "");
     } else if action == Action::Jumble {
         let mut letters = args.found.clone();
+        letters = process_search_string(&letters);
         // Note! Clap can't seem to cope with spaces in arguments, even if quoted. So
         // we use '/' in the "found" string to indicate word boundaries, e.g. "N_/M_NS/L_ND"
         let letters_no_spaces: String = letters.replace("/", "");
@@ -347,6 +350,38 @@ fn main() {
     exit(0);
 }
 
+fn process_search_string(search_string: &str) -> String {
+    let ss = search_string.replace("/", " ");
+    let mut res = "".to_string();
+    let mut num = 0;
+    for c in ss.chars() {
+        if c.is_numeric() {
+            if num != 0 {
+                num *= 10;
+            }
+            num += c.to_digit(10).unwrap();
+        } else {
+            if num != 0 {
+                for _ in 0..num {
+                    res.push('_');
+                }
+            }
+            if c == ' ' {
+                res.push('/');
+            }else{
+                res.push(c);
+            }
+            num = 0;
+        }
+    }
+    if num != 0 {
+        for _ in 0..num {
+            res.push('_');
+        }
+    }
+    res
+}
+
 fn interactive_remove(search_string: String) {
     use crossterm::{
         cursor::MoveToColumn,
@@ -377,7 +412,7 @@ fn interactive_remove(search_string: String) {
                 break;
             }
             let c = code.as_char();
-            if ! c.is_none() {
+            if !c.is_none() {
                 let c = code.as_char().unwrap().to_ascii_uppercase();
                 if let Some(pos) = s.find(c) {
                     s.remove(pos);
@@ -855,5 +890,18 @@ mod tests {
         assert_eq!(true, check_yellow_letters_exist("dryer", "__y__", "er"));
         assert_eq!(false, check_yellow_letters_exist("dryer", "__y__", "ery")); // no second y
         assert_eq!(true, check_yellow_letters_exist("dryer", "d___r", "")); // no yellow letters
+    }
+
+    #[test]
+    fn test_process_search_string() {
+        let mut ss1 = "3f3".to_string();
+        ss1 = process_search_string(&ss1);
+        assert_eq!(ss1, "___f___");
+        let mut ss2 = "3/x5".to_string();
+        ss2 = process_search_string(&ss2);
+        assert_eq!(ss2, "___ x_____");
+        let mut ss3 = "11/z4".to_string();
+        ss3 = process_search_string(&ss3);
+        assert_eq!(ss3, "___________ z____");
     }
 }

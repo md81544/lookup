@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-t", "cut", "-f", "_h__", "-e"],
+            "args": ["decimalfraction", "-f", "decimal/f7"],
             "cwd": "${workspaceFolder}"
         },
         {
