@@ -1,3 +1,5 @@
+* A number in a --found parameter could mean n number of dots follows
+
 * Provide definition of a word (see https://github.com/wordset/wordset-dictionary)
 
 * Allow -f with -r to find words in "in" clues... for example
