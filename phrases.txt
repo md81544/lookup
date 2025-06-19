@@ -15447,6 +15447,7 @@ deciduous woodland
 deciduous woods
 decimal coinage
 decimal currency
+decimal fraction
 decimal place
 decimal point
 decimal system
