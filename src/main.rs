@@ -368,7 +368,7 @@ fn process_search_string(search_string: &str) -> String {
             }
             if c == ' ' {
                 res.push('/');
-            }else{
+            } else {
                 res.push(c);
             }
             num = 0;
@@ -411,16 +411,19 @@ fn interactive_remove(search_string: String) {
                 println!("");
                 break;
             }
-            // Spacebar resets word
-            if code.as_char().unwrap() == ' ' {
-                s = search_string.to_uppercase().clone();
-                continue;
-            }
             let c = code.as_char();
             if !c.is_none() {
+                if code.as_char().unwrap() == ' ' {
+                    // Spacebar resets word
+                    s = search_string.to_uppercase().clone();
+                    continue;
+                }
                 let c = code.as_char().unwrap().to_ascii_uppercase();
                 if let Some(pos) = s.find(c) {
                     s.remove(pos);
+                } else {
+                    // Print the bell (beep)
+                    print!("{}", 0x07 as char);
                 }
             }
         }
