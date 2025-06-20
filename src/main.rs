@@ -394,7 +394,7 @@ fn interactive_remove(search_string: String) {
     let mut s = search_string.to_uppercase().clone();
     enable_raw_mode().unwrap();
     let mut stdout = stdout();
-    println!("Press Esc to exit");
+    println!("Press esc to exit, space to reset");
     loop {
         if s.is_empty() {
             break;
@@ -410,6 +410,11 @@ fn interactive_remove(search_string: String) {
             if code == KeyCode::Esc {
                 println!("");
                 break;
+            }
+            // Spacebar resets word
+            if code.as_char().unwrap() == ' ' {
+                s = search_string.to_uppercase().clone();
+                continue;
             }
             let c = code.as_char();
             if !c.is_none() {

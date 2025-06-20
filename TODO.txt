@@ -1,5 +1,3 @@
-* Space should reset the string in -r
-
 * Provide definition of a word (see https://github.com/wordset/wordset-dictionary)
 
 * Allow -f with -r to find words in "in" clues... for example
