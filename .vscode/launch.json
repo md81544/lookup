@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["decimalfraction", "-f", "decimal/f7"],
+            "args": ["trevealeachpoll", "-f", "all/over/the/5", "-a"],
             "cwd": "${workspaceFolder}"
         },
         {

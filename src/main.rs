@@ -430,18 +430,19 @@ fn remove_found_mismatches(
     found: String,
     exclude_phrases: bool,
 ) -> Vec<String> {
+    let found_letters = process_search_string(&found);
     let mut new_results: Vec<String> = Vec::new();
     let mut regex_string = "(?i)^".to_string();
-    for i in 0..found.len() {
-        if found.as_bytes()[i] == '_' as u8 {
+    for i in 0..found_letters.len() {
+        if found_letters.as_bytes()[i] == '_' as u8 {
             regex_string.push_str(".");
-        } else if found.as_bytes()[i] == '%' as u8 {
+        } else if found_letters.as_bytes()[i] == '%' as u8 {
             regex_string.push_str(".*");
             break;
-        } else if found.as_bytes()[i] == '/' as u8 {
+        } else if found_letters.as_bytes()[i] == '/' as u8 {
             regex_string.push_str(" ");
         } else {
-            regex_string.push_str(&(found.as_bytes()[i] as char).to_string());
+            regex_string.push_str(&(found_letters.as_bytes()[i] as char).to_string());
         }
     }
     if !regex_string.contains(".*") {

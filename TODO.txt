@@ -1,4 +1,4 @@
-* A number in a --found parameter could mean n number of dots follows
+* Space should reset the string in -r
 
 * Provide definition of a word (see https://github.com/wordset/wordset-dictionary)
 
