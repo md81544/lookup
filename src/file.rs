@@ -56,6 +56,26 @@ pub mod load {
         }
     }
 
+    pub fn definitions(results: &mut Vec<String>, word: &str) {
+        let file_name = "./definitions.txt".to_string();
+        if let Ok(lines) = read_lines(&file_name) {
+            for line in lines.map_while(Result::ok) {
+                let search_string = &(word.to_string() + "|");
+                if line.starts_with(search_string) {
+                    let parts = line.split("|");
+                    let mut first: bool = true;
+                    for part in parts {
+                        if first {
+                            first = false;
+                        } else {
+                            results.push(part.to_string());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     pub fn wordle(results: &mut Vec<String>, file_name: &str) {
         if let Ok(lines) = read_lines(&file_name) {
             for word in lines.map_while(Result::ok) {

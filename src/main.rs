@@ -14,6 +14,7 @@ pub mod ui;
 
 // Note, word lists are generated from public domain word lists,
 // see http://wordlist.aspell.net/12dicts-readme/
+// Definitions are from https://github.com/wordset/wordset-dictionary
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -43,6 +44,10 @@ struct Args {
     /// Thesaurus lookup. Can be combined with lookup to filter results: use BOTH -l and -t flags.
     #[arg(short, long, default_value = "")]
     thesaurus: String,
+
+    /// Display a word's definition only
+    #[arg(short, long, default_value = "")]
+    define: String,
 
     /// Plain anagram solver
     #[arg(short, long, default_value_t = false)]
@@ -143,6 +148,11 @@ fn main() {
         println!("{}", "\nError: Invalid word obscurity level".red());
         let _ = cmd.print_help();
         exit(10);
+    }
+
+    if !args.define.is_empty() {
+        define(&args.define);
+        exit(0);
     }
 
     let mut phrase_lookup = false;
@@ -783,6 +793,18 @@ fn sort_word(word: &str) -> String {
     // Strip all whitespace
     let no_space: String = word.chars().filter(|c| !c.is_whitespace()).collect();
     no_space.chars().sorted().collect::<String>()
+}
+
+fn define(word: &str) {
+    let mut results = vec![];
+    file::load::definitions(&mut results, &word);
+    if results.is_empty() {
+        println!("No definition found.");
+    } else {
+        for result in results {
+            println!(" * {}", result);
+        }
+    }
 }
 
 #[cfg(test)]
