@@ -1,3 +1,5 @@
+* Allow multiple words in definition (-d) lookup
+
 * Allow -f with -r to find words in "in" clues... for example
   -v aldershotcafedemolition -f __/__c__ should return "de facto"
 
