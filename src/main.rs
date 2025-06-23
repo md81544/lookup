@@ -323,8 +323,7 @@ fn main() {
     } else if action == Action::Jumble {
         let mut letters = args.found.clone();
         letters = process_search_string(&letters);
-        // Note! Clap can't seem to cope with spaces in arguments, even if quoted. So
-        // we use '/' in the "found" string to indicate word boundaries, e.g. "N_/M_NS/L_ND"
+        // Note we use '/' in the "found" string to indicate word boundaries, e.g. "N_/M_NS/L_ND"
         let letters_no_spaces: String = letters.replace("/", "");
         if letters_no_spaces.len() > 0 && letters_no_spaces.len() > search_string.len() {
             println!("Error: 'found' letters must be same length as search string");
