@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["trevealeachpoll", "-f", "all/over/the/5", "-a"],
+            "args": ["-d", "eating irons"],
             "cwd": "${workspaceFolder}"
         },
         {

@@ -46,8 +46,8 @@ struct Args {
     thesaurus: String,
 
     /// Display a word's definition only
-    #[arg(short, long, default_value = "")]
-    define: String,
+    #[arg(short, long, default_value = "", num_args = 1..)]
+    define: Vec<String>,
 
     /// Plain anagram solver
     #[arg(short, long, default_value_t = false)]
@@ -151,7 +151,8 @@ fn main() {
     }
 
     if !args.define.is_empty() {
-        define(&args.define);
+        let combined = args.define.join(" ");
+        define(&combined);
         exit(0);
     }
 
