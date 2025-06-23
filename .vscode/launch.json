@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-d", "eating irons"],
+            "args": ["jfkldsf"],
             "cwd": "${workspaceFolder}"
         },
         {

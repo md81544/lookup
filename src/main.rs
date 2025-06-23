@@ -150,7 +150,7 @@ fn main() {
         exit(10);
     }
 
-    if !args.define.is_empty() {
+    if !args.define.is_empty() && !args.define[0].is_empty(){
         let combined = args.define.join(" ");
         define(&combined);
         exit(0);
