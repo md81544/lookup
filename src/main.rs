@@ -176,11 +176,9 @@ fn main() {
         exit(1);
     }
 
-    // Finally allow "/" as word separators in search string (for consistency with the
-    // "found" argument which has problems with spaces in it (see comments elsewhere).
-    // We also allow numbers in the search string, these represent the number of "blanks".
+    // We allow numbers in the search string, these represent the number of "blanks".
     // so for example -f 3f7 would result in "...f......."
-    search_string = process_search_string(&search_string);
+    search_string = expand_numbers(&search_string);
 
     let mut file_name = format!("./words_{}.txt", args.obscurity).to_string();
     if args.debug {
@@ -322,7 +320,7 @@ fn main() {
         results = regex_lookup(&search_string, &thesaurus, "");
     } else if action == Action::Jumble {
         let mut letters = args.found.clone();
-        letters = process_search_string(&letters);
+        letters = expand_numbers(&letters);
         // Note we use '/' in the "found" string to indicate word boundaries, e.g. "N_/M_NS/L_ND"
         let letters_no_spaces: String = letters.replace("/", "");
         if letters_no_spaces.len() > 0 && letters_no_spaces.len() > search_string.len() {
@@ -360,7 +358,7 @@ fn main() {
     exit(0);
 }
 
-fn process_search_string(search_string: &str) -> String {
+fn expand_numbers(search_string: &str) -> String {
     let mut res = "".to_string();
     let mut num = 0;
     for c in search_string.chars() {
@@ -447,7 +445,7 @@ fn remove_found_mismatches(
     found: String,
     exclude_phrases: bool,
 ) -> Vec<String> {
-    let found_letters = process_search_string(&found);
+    let found_letters = expand_numbers(&found);
     let mut new_results: Vec<String> = Vec::new();
     let mut regex_string = "(?i)^".to_string();
     for i in 0..found_letters.len() {
@@ -923,15 +921,15 @@ mod tests {
     }
 
     #[test]
-    fn test_process_search_string() {
+    fn test_number_expansion() {
         let mut ss1 = "3f3".to_string();
-        ss1 = process_search_string(&ss1);
+        ss1 = expand_numbers(&ss1);
         assert_eq!(ss1, "___f___");
         let mut ss2 = "3/x5".to_string();
-        ss2 = process_search_string(&ss2);
+        ss2 = expand_numbers(&ss2);
         assert_eq!(ss2, "___/x_____");
         let mut ss3 = "11/z4".to_string();
-        ss3 = process_search_string(&ss3);
+        ss3 = expand_numbers(&ss3);
         assert_eq!(ss3, "___________/z____");
     }
 }
