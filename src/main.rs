@@ -151,7 +151,7 @@ fn main() {
     }
 
     if !args.define.is_empty() && !args.define[0].is_empty(){
-        let combined = args.define.join(" ");
+        let combined = args.define.join(" ").to_lowercase();
         define(&combined);
         exit(0);
     }
