@@ -1,3 +1,5 @@
+* Definition lookup is currently case sensitive
+
 * Investigate using more local loading of word lists to prevent huge collections being passed around, which slow down / make impossible usage of the debugger
 
 * Allow -f with -r to find words in "in" clues... for example
