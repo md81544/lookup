@@ -361,10 +361,9 @@ fn main() {
 }
 
 fn process_search_string(search_string: &str) -> String {
-    let ss = search_string.replace("/", " ");
     let mut res = "".to_string();
     let mut num = 0;
-    for c in ss.chars() {
+    for c in search_string.chars() {
         if c.is_numeric() {
             if num != 0 {
                 num *= 10;
@@ -930,9 +929,9 @@ mod tests {
         assert_eq!(ss1, "___f___");
         let mut ss2 = "3/x5".to_string();
         ss2 = process_search_string(&ss2);
-        assert_eq!(ss2, "___ x_____");
+        assert_eq!(ss2, "___/x_____");
         let mut ss3 = "11/z4".to_string();
         ss3 = process_search_string(&ss3);
-        assert_eq!(ss3, "___________ z____");
+        assert_eq!(ss3, "___________/z____");
     }
 }
