@@ -150,7 +150,7 @@ fn main() {
         exit(10);
     }
 
-    if !args.define.is_empty() && !args.define[0].is_empty(){
+    if !args.define.is_empty() && !args.define[0].is_empty() {
         let combined = args.define.join(" ").to_lowercase();
         define(&combined);
         exit(0);
@@ -496,29 +496,30 @@ fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<Strin
         }
         for i in 0..word.len() {
             let c = word.as_bytes()[i] as char;
-            let search_char = search_string.as_bytes()[i] as char;
+            let mut search_char = search_string.as_bytes()[i] as char;
+            if search_char == '/' {
+                search_char = ' ';
+            }
             // Only exclude characters if they aren't explicitly at this position in the
             // search string, meaning "a___t -x a" would still match "avast", for example
             if c != search_char && exclude.contains(c) {
                 matched = false;
                 break;
             }
-            if search_string.as_bytes()[i] == '_' as u8 || search_string.as_bytes()[i] == '.' as u8
-            {
+            if search_char == '_' || search_char == '.' {
                 // wildcard - we only pass this if the character we're comparing
                 // is not a space (i.e. we wouldn't want "__ _____" to match "AA AA AA")
-                if word.as_bytes()[i] == 32 {
-                    // i.e. ' '
+                if word.as_bytes()[i] == ' ' as u8 {
                     matched = false;
                     break;
                 }
                 continue;
             }
-            if search_string.as_bytes()[i] == '%' as u8 {
+            if search_char == '%' {
                 // match any word past this point
                 break;
             }
-            if search_string.as_bytes()[i] != word.as_bytes()[i] {
+            if search_char != word.as_bytes()[i] as char {
                 matched = false;
                 break;
             }
@@ -853,6 +854,7 @@ mod tests {
             "cartload".to_string(),
             "frobnish".to_string(),
             "frazzled".to_string(),
+            "not care".to_string(),
         ];
         let results = lookup("f_o_ni__", &words, "");
         assert_eq!(results.len(), 1); // should match "frobnish"
@@ -860,6 +862,8 @@ mod tests {
         assert_eq!(results2.len(), 0); // should not match anything
         let results3 = lookup("fra_____", &words, "z");
         assert_eq!(results3.len(), 0); // should not match anything
+        let results4 = lookup("not/c___", &words, "z");
+        assert_eq!(results4.len(), 1); // should match "not care"
     }
     #[test]
 
