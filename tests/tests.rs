@@ -141,10 +141,12 @@ fn test_regex_lookup() {
         "wryly".to_string(),
     ];
     let mut results : Vec<String> = regex_lookup("d", &words);
-    assert!(!results.is_empty());
+    assert!(results.len() == 3);
     results = regex_lookup("k", &words);
     assert!(results.len() == 1);
     results = regex_lookup("..d..", &words);
     assert!(results.len() == 1);
     assert_eq!(results[0], "dodge");
+    results = regex_lookup("^..y..$", &words);
+    assert!(results.len() == 2);
 }
