@@ -405,14 +405,6 @@ fn regular_patterns(search_string: &str, reverse: bool) -> Vec<String> {
     results
 }
 
-fn reverse(search_string: &str) -> Vec<String> {
-    // Just reverse the search string... useful for reverse 'in' clues, for example
-    // "BEER IFFY" would print "YFFIREEB" from which the answer might be "FIRE"
-    let mut results: Vec<String> = Vec::new();
-    let word = search_string.chars().rev().collect::<String>();
-    results.push(word);
-    results
-}
 
 fn define(word: &str) {
     let mut results = vec![];

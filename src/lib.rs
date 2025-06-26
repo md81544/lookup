@@ -300,3 +300,12 @@ pub fn jumble(full_input: &str, found_letters: &str, size: u8) {
 
     ui::display::anagram_helper(found_letters, chars, len);
 }
+
+pub fn reverse(search_string: &str) -> Vec<String> {
+    // Just reverse the search string... useful for reverse 'in' clues, for example
+    // "BEER IFFY" would print "YFFIREEB" from which the answer might be "FIRE"
+    let mut results: Vec<String> = Vec::new();
+    let word = search_string.chars().rev().collect::<String>();
+    results.push(word);
+    results
+}

@@ -150,3 +150,10 @@ fn test_regex_lookup() {
     results = regex_lookup("^..y..$", &words);
     assert!(results.len() == 2);
 }
+
+#[test]
+fn test_reverse() {
+    let result = reverse("clock");
+    assert!(result.len() == 1);
+    assert!(result[0] == "kcolc");
+}
