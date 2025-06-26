@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["jfkldsf"],
+            "args": ["isailedoceans", "-f", "4d./n", "-a"],
             "cwd": "${workspaceFolder}"
         },
         {
