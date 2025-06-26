@@ -85,4 +85,55 @@ pub mod display {
         }
         println!();
     }
+
+    pub fn interactive_remove(search_string: String) {
+        use crossterm::{
+            cursor::MoveToColumn,
+            event::{self, Event, KeyCode, KeyEvent},
+            execute,
+            style::Print,
+            terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
+        };
+        use std::io::stdout;
+        let mut s = search_string.to_uppercase().clone();
+        enable_raw_mode().unwrap();
+        let mut stdout = stdout();
+        println!("Press esc to exit, space to reset");
+        loop {
+            if s.is_empty() {
+                break;
+            }
+            execute!(
+                stdout,
+                MoveToColumn(0),
+                Clear(ClearType::CurrentLine),
+                Print(format!("{} ", s))
+            )
+            .unwrap();
+            if let Event::Key(KeyEvent { code, .. }) = event::read().unwrap() {
+                if code == KeyCode::Esc {
+                    println!();
+                    break;
+                }
+                let c = code.as_char();
+                if c.is_some() {
+                    if code.as_char().unwrap() == ' ' {
+                        // Spacebar resets word
+                        s = search_string.to_uppercase().clone();
+                        continue;
+                    }
+                    let c = code.as_char().unwrap().to_ascii_uppercase();
+                    if let Some(pos) = s.find(c) {
+                        s.remove(pos);
+                    } else {
+                        // Print the bell (beep)
+                        print!("{}", 0x07 as char);
+                    }
+                }
+            }
+        }
+        execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
+        disable_raw_mode().unwrap();
+        println!();
+    }
 }
