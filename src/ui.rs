@@ -123,7 +123,7 @@ pub mod display {
             }
             execute!(
                 stdout,
-                Print(format!("  (Press esc to quit, space to reset)")),
+                Print("  (Press esc to quit, space to reset)".to_string()),
                 RestorePosition
             )
             .unwrap();
