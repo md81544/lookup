@@ -130,7 +130,7 @@ pub mod display {
 
             if let Event::Key(KeyEvent { code, .. }) = event::read().unwrap() {
                 if code == KeyCode::Esc {
-                    println!();
+                    execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
                     break;
                 }
                 let c = code.as_char();
