@@ -3,6 +3,7 @@ pub mod display {
     use crate::Action;
 
     use colored::Colorize;
+    use crossterm::cursor::{RestorePosition, SavePosition};
 
     fn print_separator(narrow: bool) {
         if narrow {
@@ -96,9 +97,10 @@ pub mod display {
         };
         use std::io::stdout;
         let mut s = search_string.to_uppercase().clone();
+        let mut removed = "".to_string();
         enable_raw_mode().unwrap();
         let mut stdout = stdout();
-        println!("Press esc to exit, space to reset");
+        println!();
         loop {
             if s.is_empty() {
                 break;
@@ -107,9 +109,25 @@ pub mod display {
                 stdout,
                 MoveToColumn(0),
                 Clear(ClearType::CurrentLine),
-                Print(format!("{} ", s))
+                Print(format!("{} ", s)),
+                SavePosition
             )
             .unwrap();
+            if !removed.is_empty() {
+                execute!(
+                    stdout,
+                    SavePosition,
+                    Print(format!(" removed: {}  ", removed))
+                )
+                .unwrap();
+            }
+            execute!(
+                stdout,
+                Print(format!("  (Press esc to quit, space to reset)")),
+                RestorePosition
+            )
+            .unwrap();
+
             if let Event::Key(KeyEvent { code, .. }) = event::read().unwrap() {
                 if code == KeyCode::Esc {
                     println!();
@@ -120,11 +138,13 @@ pub mod display {
                     if code.as_char().unwrap() == ' ' {
                         // Spacebar resets word
                         s = search_string.to_uppercase().clone();
+                        removed = "".to_string();
                         continue;
                     }
                     let c = code.as_char().unwrap().to_ascii_uppercase();
                     if let Some(pos) = s.find(c) {
                         s.remove(pos);
+                        removed.push(c);
                     } else {
                         // Print the bell (beep)
                         print!("{}", 0x07 as char);
@@ -134,6 +154,7 @@ pub mod display {
         }
         execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
         disable_raw_mode().unwrap();
+        println!("{}", removed);
         println!();
     }
 }
