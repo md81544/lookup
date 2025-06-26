@@ -310,12 +310,17 @@ pub fn reverse(search_string: &str) -> Vec<String> {
     results
 }
 
+fn remove_whitespace(s: &mut String) {
+    s.retain(|c| !c.is_whitespace());
+}
+
 pub fn regular_patterns(search_string: &str, reverse: bool) -> Vec<String> {
     // Just give a selection of regular letters from the search string, e.g.
     // "BRO SNEERS" could yield "BONES" and "RSER"
     // If the reverse flag is specified we do it in reverse
     let mut word: String;
     word = search_string.to_string();
+    remove_whitespace(&mut word);
     if reverse {
         word = word.chars().rev().collect();
     }

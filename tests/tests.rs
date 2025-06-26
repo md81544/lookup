@@ -168,4 +168,9 @@ fn test_regular_patterns() {
     assert!(result.len() == 2);
     assert!(result[0] == "SENOB");
     assert!(result[1] == "RESR");
+    // Check that spaces are ignored in the input
+    result = regular_patterns("BRO SNEERS", false);
+    assert!(result.len() == 2);
+    assert!(result[0] == "BONES");
+    assert!(result[1] == "RSER");
 }
