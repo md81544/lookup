@@ -311,9 +311,9 @@ fn main() {
             results.retain(|item| thesaurus.contains(item));
         }
     } else if action == Action::Regex {
-        results = regex_lookup(&search_string, &word_list, "");
+        results = regex_lookup(&search_string, &word_list);
     } else if action == Action::RegexWithThesaurus {
-        results = regex_lookup(&search_string, &thesaurus, "");
+        results = regex_lookup(&search_string, &thesaurus);
     } else if action == Action::Jumble {
         let mut letters = args.found.clone();
         letters = expand_numbers(&letters);
@@ -399,18 +399,6 @@ fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
         }
     }
     new_results
-}
-
-fn regex_lookup(search_string: &str, word_list: &[String], _exclude: &str) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
-    let re = Regex::new(search_string).unwrap();
-
-    for word in word_list {
-        if re.is_match(word) {
-            results.push(word.to_string());
-        }
-    }
-    results
 }
 
 fn regular_patterns(search_string: &str, reverse: bool) -> Vec<String> {

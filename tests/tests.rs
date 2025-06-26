@@ -130,3 +130,21 @@ fn test_number_expansion() {
     ss3 = expand_numbers(&ss3);
     assert_eq!(ss3, "___________/z____");
 }
+
+#[test]
+fn test_regex_lookup() {
+    let words = vec![
+        "knelt".to_string(),
+        "dodge".to_string(),
+        "dryer".to_string(),
+        "druid".to_string(),
+        "wryly".to_string(),
+    ];
+    let mut results : Vec<String> = regex_lookup("d", &words);
+    assert!(!results.is_empty());
+    results = regex_lookup("k", &words);
+    assert!(results.len() == 1);
+    results = regex_lookup("..d..", &words);
+    assert!(results.len() == 1);
+    assert_eq!(results[0], "dodge");
+}

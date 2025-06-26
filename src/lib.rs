@@ -230,3 +230,15 @@ pub fn expand_numbers(search_string: &str) -> String {
     }
     res
 }
+pub fn regex_lookup(search_string: &str, word_list: &[String]) -> Vec<String> {
+    use regex::Regex;
+    let mut results: Vec<String> = Vec::new();
+    let re = Regex::new(search_string).unwrap();
+
+    for word in word_list {
+        if re.is_match(word) {
+            results.push(word.to_string());
+        }
+    }
+    results
+}
