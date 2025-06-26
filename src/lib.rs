@@ -309,3 +309,28 @@ pub fn reverse(search_string: &str) -> Vec<String> {
     results.push(word);
     results
 }
+
+pub fn regular_patterns(search_string: &str, reverse: bool) -> Vec<String> {
+    // Just give a selection of regular letters from the search string, e.g.
+    // "BRO SNEERS" could yield "BONES" and "RSER"
+    // If the reverse flag is specified we do it in reverse
+    let mut word: String;
+    word = search_string.to_string();
+    if reverse {
+        word = word.chars().rev().collect();
+    }
+    let mut results: Vec<String> = Vec::new();
+    let mut word_evens: String = String::new();
+    let mut word_odds: String = String::new();
+    for (count, c) in word.chars().enumerate() {
+        if count % 2 == 0 {
+            word_evens.push(c);
+        } else {
+            word_odds.push(c);
+        }
+    }
+    results.push(word_evens);
+    results.push(word_odds);
+    results
+}
+

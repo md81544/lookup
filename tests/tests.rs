@@ -157,3 +157,15 @@ fn test_reverse() {
     assert!(result.len() == 1);
     assert!(result[0] == "kcolc");
 }
+
+#[test]
+fn test_regular_patterns() {
+    let mut result = regular_patterns("BROSNEERS", false);
+    assert!(result.len() == 2);
+    assert!(result[0] == "BONES");
+    assert!(result[1] == "RSER");
+    result = regular_patterns("BROSNEERS", true); // reverse regular patterns
+    assert!(result.len() == 2);
+    assert!(result[0] == "SENOB");
+    assert!(result[1] == "RESR");
+}
