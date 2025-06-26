@@ -1,13 +1,13 @@
 use clap::{ArgGroup, Parser};
 use colored::Colorize;
-use itertools::Itertools;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use regex::Regex;
 use std::collections::HashMap;
-use std::collections::HashSet;
 use std::f32::consts::PI;
 use std::process::exit;
+
+use lookup::*;
 
 pub mod file;
 pub mod ui;
@@ -24,7 +24,6 @@ pub mod ui;
         .required(false)
         .args(&["wordle", "spellingbee", "panagram", "lookup", "jumble"]),
 ))]
-
 // Note, this magic incantation way of defining arguments for clap is called "derive"
 // (see https://docs.rs/clap/latest/clap/_derive/_tutorial/index.html)
 struct Args {
@@ -303,11 +302,9 @@ fn main() {
     } else if action == Action::Anagram {
         results = anagram_search(&search_string, &word_list, &anagrams);
     } else if action == Action::Lookup || action == Action::LookupWithThesaurus {
-        if search_string.contains('%') {
-            if search_string.find('%') != Some(search_string.len() - 1) {
-                println!("Error: '%' wildcard must only be used at end of search string");
-                exit(8);
-            }
+        if search_string.contains('%') && search_string.find('%') != Some(search_string.len() - 1) {
+            println!("Error: '%' wildcard must only be used at end of search string");
+            exit(8);
         }
         results = lookup(&search_string, &word_list, "");
         if action == Action::LookupWithThesaurus {
@@ -323,7 +320,7 @@ fn main() {
         letters = expand_numbers(&letters);
         // Note we use '/' in the "found" string to indicate word boundaries, e.g. "N_/M_NS/L_ND"
         let letters_no_spaces: String = letters.replace("/", "");
-        if letters_no_spaces.len() > 0 && letters_no_spaces.len() > search_string.len() {
+        if !letters_no_spaces.is_empty() && letters_no_spaces.len() > search_string.len() {
             println!("Error: 'found' letters must be same length as search string");
             exit(7);
         }
@@ -345,48 +342,17 @@ fn main() {
         results = reverse(&search_string.to_uppercase());
     }
 
-    if args.size != 0 {
+    if !args.found.is_empty() {
         results = remove_wrong_sized_words(&results, args.size);
     }
 
-    if args.found.len() > 0 {
+    if !args.found.is_empty() {
         results = remove_found_mismatches(&results, args.found, args.excludephrases);
     }
 
     results.sort();
     ui::display::show_results(&results, &search_string, action, args.narrow);
     exit(0);
-}
-
-fn expand_numbers(search_string: &str) -> String {
-    let mut res = "".to_string();
-    let mut num = 0;
-    for c in search_string.chars() {
-        if c.is_numeric() {
-            if num != 0 {
-                num *= 10;
-            }
-            num += c.to_digit(10).unwrap();
-        } else {
-            if num != 0 {
-                for _ in 0..num {
-                    res.push('_');
-                }
-            }
-            if c == ' ' {
-                res.push('/');
-            } else {
-                res.push(c);
-            }
-            num = 0;
-        }
-    }
-    if num != 0 {
-        for _ in 0..num {
-            res.push('_');
-        }
-    }
-    res
 }
 
 fn interactive_remove(search_string: String) {
@@ -415,11 +381,11 @@ fn interactive_remove(search_string: String) {
         .unwrap();
         if let Event::Key(KeyEvent { code, .. }) = event::read().unwrap() {
             if code == KeyCode::Esc {
-                println!("");
+                println!();
                 break;
             }
             let c = code.as_char();
-            if !c.is_none() {
+            if c.is_some() {
                 if code.as_char().unwrap() == ' ' {
                     // Spacebar resets word
                     s = search_string.to_uppercase().clone();
@@ -437,7 +403,7 @@ fn interactive_remove(search_string: String) {
     }
     execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
     disable_raw_mode().unwrap();
-    println!("");
+    println!();
 }
 
 fn remove_found_mismatches(
@@ -449,15 +415,15 @@ fn remove_found_mismatches(
     let mut new_results: Vec<String> = Vec::new();
     let mut regex_string = "(?i)^".to_string();
     for i in 0..found_letters.len() {
-        if found_letters.as_bytes()[i] == '_' as u8 {
-            regex_string.push_str(".");
-        } else if found_letters.as_bytes()[i] == '%' as u8 {
+        if found_letters.as_bytes()[i] == b'_' {
+            regex_string.push('.');
+        } else if found_letters.as_bytes()[i] == b'%' {
             regex_string.push_str(".*");
             break;
-        } else if found_letters.as_bytes()[i] == '/' as u8 {
-            regex_string.push_str(" ");
+        } else if found_letters.as_bytes()[i] == b'/' {
+            regex_string.push(' ');
         } else {
-            regex_string.push_str(&(found_letters.as_bytes()[i] as char).to_string());
+            regex_string.push(found_letters.as_bytes()[i] as char);
         }
     }
     if !regex_string.contains(".*") {
@@ -487,50 +453,6 @@ fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
     new_results
 }
 
-fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<String> {
-    let mut results: HashSet<String> = HashSet::new();
-    for word in word_list {
-        let mut matched = true;
-        if word.len() != search_string.len() && !search_string.contains('%') {
-            continue;
-        }
-        for i in 0..word.len() {
-            let c = word.as_bytes()[i] as char;
-            let mut search_char = search_string.as_bytes()[i] as char;
-            if search_char == '/' {
-                search_char = ' ';
-            }
-            // Only exclude characters if they aren't explicitly at this position in the
-            // search string, meaning "a___t -x a" would still match "avast", for example
-            if c != search_char && exclude.contains(c) {
-                matched = false;
-                break;
-            }
-            if search_char == '_' || search_char == '.' {
-                // wildcard - we only pass this if the character we're comparing
-                // is not a space (i.e. we wouldn't want "__ _____" to match "AA AA AA")
-                if word.as_bytes()[i] == ' ' as u8 {
-                    matched = false;
-                    break;
-                }
-                continue;
-            }
-            if search_char == '%' {
-                // match any word past this point
-                break;
-            }
-            if search_char != word.as_bytes()[i] as char {
-                matched = false;
-                break;
-            }
-        }
-        if matched {
-            results.insert(word.to_string());
-        }
-    }
-    results.into_iter().collect()
-}
-
 fn regex_lookup(search_string: &str, word_list: &[String], _exclude: &str) -> Vec<String> {
     let mut results: Vec<String> = Vec::new();
     let re = Regex::new(search_string).unwrap();
@@ -553,16 +475,14 @@ fn regular_patterns(search_string: &str, reverse: bool) -> Vec<String> {
         word = word.chars().rev().collect();
     }
     let mut results: Vec<String> = Vec::new();
-    let mut count = 0;
     let mut word_evens: String = String::new();
     let mut word_odds: String = String::new();
-    for c in word.chars() {
+    for (count, c) in word.chars().enumerate() {
         if count % 2 == 0 {
             word_evens.push(c);
         } else {
             word_odds.push(c);
         }
-        count += 1;
     }
     results.push(word_evens);
     results.push(word_odds);
@@ -575,53 +495,6 @@ fn reverse(search_string: &str) -> Vec<String> {
     let mut results: Vec<String> = Vec::new();
     let word = search_string.chars().rev().collect::<String>();
     results.push(word);
-    results
-}
-
-fn anagram_search(
-    search_string: &str,
-    word_list: &[String],
-    anagrams: &HashMap<String, Vec<usize>>,
-) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
-    let search_string = sort_word(search_string);
-    if let Some(indices) = anagrams.get(&search_string) {
-        for idx in indices {
-            results.push(word_list[*idx].to_string());
-        }
-    }
-    results
-}
-
-fn panagram(
-    search_string: &str,
-    word_list: &[String],
-    anagrams: &HashMap<String, Vec<usize>>,
-) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
-    if search_string.len() != 9 {
-        println!("Error: search string must have nine letters");
-        exit(3);
-    }
-    let mut chars: Vec<_> = search_string.chars().collect();
-    let required_letter = chars[0];
-    chars.remove(0);
-    let mut lookups = HashSet::new();
-    for i in 3..9 {
-        for word in chars.iter().permutations(i).unique() {
-            let w1: String = required_letter.to_string();
-            let w2: String = word.into_iter().collect();
-            let word_str: String = sort_word(&format!("{}{}", w1, w2));
-            lookups.insert(word_str);
-        }
-    }
-    for word in lookups {
-        if let Some(indices) = anagrams.get(&word) {
-            for idx in indices {
-                results.push(word_list[*idx].to_string());
-            }
-        }
-    }
     results
 }
 
@@ -694,246 +567,14 @@ fn jumble(full_input: &str, found_letters: &str, size: u8) {
     println!();
 }
 
-fn spellingbee(search_string: &str, word_list: &Vec<String>, debug: bool) -> Vec<String> {
-    let mut results: Vec<String> = Vec::new();
-    let mut included_chars = "".to_string();
-    let mut excluded_chars = "".to_string();
-    for i in 97u8..=122 {
-        // 'a' to 'z'
-        let t = i as char;
-        let c = t.to_string();
-        if !search_string.contains(&c) {
-            excluded_chars += c.as_str();
-        } else {
-            included_chars += c.as_str();
-        }
-    }
-    if debug {
-        println!("Excluded characters: [{}]", excluded_chars);
-        println!("Included characters: [{}]", included_chars);
-    }
-    let min_len = 4;
-    for word in word_list {
-        let mut invalid = false;
-        if debug {
-            print!("\"{}\" : ", word);
-        }
-        if word.len() < min_len {
-            if debug {
-                println!("is too short");
-            }
-            continue;
-        }
-        for c in word.chars() {
-            if excluded_chars.contains(c) {
-                if debug {
-                    println!("contains excluded char '{}'", c);
-                }
-                invalid = true;
-                break;
-            }
-        }
-        if invalid {
-            continue;
-        }
-        // We now just have to ensure the word contains the mandatory letter
-        // which should be the first letter of the search string
-        let c = search_string.chars().next().unwrap();
-        if !word.contains(c) {
-            continue;
-        }
-        // If we get here, we haven't failed any checks, so it's a match
-        if debug {
-            println!(" *** match ***");
-        } else {
-            results.push(word.to_string());
-        }
-    }
-    results
-}
-
-fn wordle(search_string: &str, word_list: &[String], exclude: &str, include: &str) -> Vec<String> {
-    // First we do a lookup using just the "green" letters
-    // (i.e. those supplied in the search string), excluding the exclude letters:
-    let results = lookup(search_string, word_list, exclude);
-    // Now we can go through the results and weed out items that don't have the "yellow" letters
-    let mut matches: Vec<String> = Vec::new();
-    for word in &results {
-        if check_yellow_letters_exist(word, search_string, include) {
-            matches.push(word.clone());
-        }
-    }
-    matches
-}
-
-fn check_yellow_letters_exist(w: &str, search_string: &str, yellow_letters: &str) -> bool {
-    // check that all "yellow" letters in the search_string exist in the word
-    // BUT not at their position in the search string
-    // we can also ignore any matches at positions which are "green"
-    // To simplify the logic we remove any "green" letters from the word first
-    let mut word = w.to_string();
-    for i in 0..5 {
-        if search_string.as_bytes()[i].is_ascii_alphabetic() {
-            word.replace_range(i..=i, "."); // replace with an arbitrary non alpha character
-        }
-    }
-    // Now we can just check all of the yellow letters exist
-    for i in 0..yellow_letters.len() {
-        let c = yellow_letters.as_bytes()[i] as char;
-        if !word.contains(c) {
-            return false;
-        }
-    }
-    true
-}
-
-fn sort_word(word: &str) -> String {
-    // Strip all whitespace
-    let no_space: String = word.chars().filter(|c| !c.is_whitespace()).collect();
-    no_space.chars().sorted().collect::<String>()
-}
-
 fn define(word: &str) {
     let mut results = vec![];
-    file::load::definitions(&mut results, &word);
+    file::load::definitions(&mut results, word);
     if results.is_empty() {
         println!("No definition found.");
     } else {
         for result in results {
             println!(" * {}", result);
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_sort_word() {
-        assert_eq!("aaeeilmort", sort_word("ameliorate"));
-    }
-
-    #[test]
-    fn test_spellingbee() {
-        let words = vec![
-            "doctoral".to_string(),
-            "cartload".to_string(),
-            "frobnish".to_string(),
-        ];
-        let results = spellingbee("roldact", &words, false);
-        assert_eq!(results.len(), 2); // should match "doctoral" and "cartload"
-    }
-
-    #[test]
-    fn test_panagram() {
-        let words = vec!["cartload".to_string(), "plaintiff".to_string()];
-        let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
-        anagrams.insert("aacdlort".to_string(), vec![0usize]);
-        anagrams.insert("affiilnpt".to_string(), vec![1usize]);
-        let results = panagram("infaflipt", &words, &anagrams);
-        assert_eq!(results.len(), 1); // should match "plaintiff"
-    }
-
-    #[test]
-    fn test_anagram_search() {
-        let words = vec!["cartload".to_string(), "plaintiff".to_string()];
-        let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
-        anagrams.insert("aacdlort".to_string(), vec![0usize]);
-        anagrams.insert("affiilnpt".to_string(), vec![1usize]);
-        let results = anagram_search("infaflipt", &words, &anagrams);
-        assert_eq!(results.len(), 1); // should match "plaintiff"
-        let results2 = anagram_search("frobnish", &words, &anagrams);
-        assert_eq!(results2.len(), 0); // should not match any
-    }
-
-    #[test]
-    fn test_lookup() {
-        let words = vec![
-            "doctoral".to_string(),
-            "cartload".to_string(),
-            "frobnish".to_string(),
-            "frazzled".to_string(),
-            "not care".to_string(),
-        ];
-        let results = lookup("f_o_ni__", &words, "");
-        assert_eq!(results.len(), 1); // should match "frobnish"
-        let results2 = lookup("s__v", &words, "");
-        assert_eq!(results2.len(), 0); // should not match anything
-        let results3 = lookup("fra_____", &words, "z");
-        assert_eq!(results3.len(), 0); // should not match anything
-        let results4 = lookup("not/c___", &words, "z");
-        assert_eq!(results4.len(), 1); // should match "not care"
-    }
-    #[test]
-
-    fn test_lookup_phrase() {
-        let words = vec![
-            "i feel fine".to_string(),
-            "a fine mess".to_string(),
-            "a dead duck".to_string(),
-            "a dandelion".to_string(),
-        ];
-        let results = lookup("a d___ ___k", &words, "");
-        assert_eq!(results.len(), 1); // should match "a dead duck"
-        let results2 = lookup("a d________", &words, "");
-        assert_eq!(results2.len(), 1); // should only match "a dandelion", not "a dead duck"
-    }
-
-    #[test]
-    fn test_wordle() {
-        let words = vec![
-            "knelt".to_string(),
-            "dodge".to_string(),
-            "dryer".to_string(),
-            "druid".to_string(),
-            "wryly".to_string(),
-        ];
-        // We are specifically testing that wordle() finds two Ys in the results, and
-        // not simply matching both against the green letter
-        let results = wordle("_ry__", &words, "", "y"); // exclude, include
-        assert_eq!(results.len(), 1); // should only match "wryly"
-
-        let results2 = wordle("_____", &words, "", "er");
-        assert_eq!(results2.len(), 1); // should only match "dryer"
-        assert_eq!(results2[0], "dryer");
-
-        let results3 = wordle("dr___", &words, "y", "");
-        assert_eq!(results3.len(), 1); // should only match "druid" because we exclude y
-
-        // What if the use includes a letter that is already "green"? This signifies
-        // that there's ANOTHER yellow d
-        let results4 = wordle("d____", &words, "", "d");
-        assert_eq!(results4.len(), 2); // should only match "druid", and "dodge"
-    }
-
-    #[test]
-    fn test_wordle_exclude_green() {
-        let words = vec!["adult".to_string()];
-        // Case where the user might have excluded a letter which is also in the search
-        // string (i.e. is "green"). This should exclude words that have the excluded letter
-        // in any position OTHER than the supplied green one.
-        let results = wordle("a___t", &words, "a", ""); // exclude, include
-        assert_eq!(results.len(), 1); // should match
-    }
-
-    #[test]
-    fn test_yellow_check() {
-        assert_eq!(true, check_yellow_letters_exist("dryer", "__y__", "er"));
-        assert_eq!(false, check_yellow_letters_exist("dryer", "__y__", "ery")); // no second y
-        assert_eq!(true, check_yellow_letters_exist("dryer", "d___r", "")); // no yellow letters
-    }
-
-    #[test]
-    fn test_number_expansion() {
-        let mut ss1 = "3f3".to_string();
-        ss1 = expand_numbers(&ss1);
-        assert_eq!(ss1, "___f___");
-        let mut ss2 = "3/x5".to_string();
-        ss2 = expand_numbers(&ss2);
-        assert_eq!(ss2, "___/x_____");
-        let mut ss3 = "11/z4".to_string();
-        ss3 = expand_numbers(&ss3);
-        assert_eq!(ss3, "___________/z____");
     }
 }
