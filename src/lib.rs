@@ -8,6 +8,7 @@ use itertools::Itertools;
 use rand::{seq::SliceRandom, thread_rng};
 
 pub mod ui;
+pub mod file;
 
 #[derive(Eq, PartialEq)]
 pub enum Action {
@@ -385,4 +386,16 @@ pub fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
         }
     }
     new_results
+}
+
+pub fn define(word: &str) {
+    let mut results = vec![];
+    file::load::definitions(&mut results, word);
+    if results.is_empty() {
+        println!("No definition found.");
+    } else {
+        for result in results {
+            println!(" * {}", result);
+        }
+    }
 }

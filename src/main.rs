@@ -332,15 +332,3 @@ fn main() {
     ui::display::show_results(&results, &search_string, action, args.narrow);
     exit(0);
 }
-
-fn define(word: &str) {
-    let mut results = vec![];
-    file::load::definitions(&mut results, word);
-    if results.is_empty() {
-        println!("No definition found.");
-    } else {
-        for result in results {
-            println!(" * {}", result);
-        }
-    }
-}
