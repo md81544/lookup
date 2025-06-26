@@ -3,7 +3,6 @@ pub mod display {
     use crate::Action;
 
     use colored::Colorize;
-    use crossterm::cursor::{RestorePosition, SavePosition};
 
     fn print_separator(narrow: bool) {
         if narrow {
@@ -89,8 +88,8 @@ pub mod display {
 
     pub fn interactive_remove(search_string: String) {
         use crossterm::{
-            cursor::MoveToColumn,
-            event::{self, Event, KeyCode, KeyEvent},
+            cursor::{MoveToColumn, RestorePosition, SavePosition},
+            event::{self, Event, KeyCode, KeyEvent, KeyEventKind},
             execute,
             style::Print,
             terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
@@ -128,26 +127,28 @@ pub mod display {
             )
             .unwrap();
 
-            if let Event::Key(KeyEvent { code, .. }) = event::read().unwrap() {
-                if code == KeyCode::Esc {
-                    execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
-                    break;
-                }
-                let c = code.as_char();
-                if c.is_some() {
-                    if code.as_char().unwrap() == ' ' {
-                        // Spacebar resets word
-                        s = search_string.to_uppercase().clone();
-                        removed = "".to_string();
-                        continue;
+            if let Event::Key(KeyEvent { code, kind, .. }) = event::read().unwrap() {
+                if kind == KeyEventKind::Press {
+                    if code == KeyCode::Esc {
+                        execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
+                        break;
                     }
-                    let c = code.as_char().unwrap().to_ascii_uppercase();
-                    if let Some(pos) = s.find(c) {
-                        s.remove(pos);
-                        removed.push(c);
-                    } else {
-                        // Print the bell (beep)
-                        print!("{}", 0x07 as char);
+                    let c = code.as_char();
+                    if c.is_some() {
+                        if code.as_char().unwrap() == ' ' {
+                            // Spacebar resets word
+                            s = search_string.to_uppercase().clone();
+                            removed = "".to_string();
+                            continue;
+                        }
+                        let c = code.as_char().unwrap().to_ascii_uppercase();
+                        if let Some(pos) = s.find(c) {
+                            s.remove(pos);
+                            removed.push(c);
+                        } else {
+                            // Print the bell (beep)
+                            print!("{}", 0x07 as char);
+                        }
                     }
                 }
             }
