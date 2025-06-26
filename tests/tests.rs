@@ -215,3 +215,15 @@ fn test_remove_wrong_sized_words() {
     assert!(results.len() == 1);
     assert!(results[0] == "avails");
 }
+
+#[test]
+fn test_expand_numbers() {
+    let result = expand_numbers("3e4");
+    assert!(result == "___e____");
+    let result2 = expand_numbers("14x");
+    assert!(result2 == "______________x");
+    let result3 = expand_numbers("15");
+    assert!(result3 == "_______________");
+    let result4 = expand_numbers("1024");
+    assert!(result4.len() == 1024);
+}
