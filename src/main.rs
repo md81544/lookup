@@ -333,18 +333,6 @@ fn main() {
     exit(0);
 }
 
-fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
-    let mut new_results: Vec<String> = Vec::new();
-    for word in results {
-        let mut w = word.clone();
-        w.retain(|c| !c.is_whitespace());
-        if w.len() == length.into() {
-            new_results.push(word.to_string());
-        }
-    }
-    new_results
-}
-
 fn define(word: &str) {
     let mut results = vec![];
     file::load::definitions(&mut results, word);

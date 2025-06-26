@@ -196,3 +196,22 @@ fn test_remove_found_mismatches() {
     results = remove_found_mismatches(&words, found, true); // ignore phrases
     assert!(results.len() == 1);
 }
+
+#[test]
+fn test_remove_wrong_sized_words() {
+    let words = vec![
+        "a".to_string(),
+        "be".to_string(),
+        "cat".to_string(),
+        "four".to_string(),
+        "table".to_string(),
+        "avails".to_string(),
+        "flashes".to_string(),
+        "walkover".to_string(),
+        "subnormal".to_string(),
+        "spherality".to_string(),
+    ];
+    let results = remove_wrong_sized_words(&words, 6);
+    assert!(results.len() == 1);
+    assert!(results[0] == "avails");
+}
