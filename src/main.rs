@@ -4,7 +4,6 @@ use rand::seq::SliceRandom;
 use rand::thread_rng;
 use regex::Regex;
 use std::collections::HashMap;
-use std::f32::consts::PI;
 use std::process::exit;
 
 use lookup::*;
@@ -532,39 +531,7 @@ fn jumble(full_input: &str, found_letters: &str, size: u8) {
     let mut rng = thread_rng();
     chars.shuffle(&mut rng);
 
-    let radius = ((len as f32 / PI).sqrt().ceil()) as usize;
-    let mut grid = vec![vec![' '; radius * 4 + 1]; radius * 2 + 1];
-
-    for i in 0..len / 2 {
-        let angle = (i as f32 / (len / 2) as f32) * PI;
-
-        let x1 = (radius as f32 * angle.cos()).round() as isize;
-        let y1 = (radius as f32 * angle.sin()).round() as isize;
-
-        let x2 = -(radius as f32 * angle.cos()).round() as isize;
-        let y2 = -(radius as f32 * angle.sin()).round() as isize;
-
-        grid[(y1 + radius as isize) as usize][(x1 * 2 + radius as isize * 2) as usize] =
-            chars[i * 2].to_ascii_uppercase();
-        grid[(y2 + radius as isize) as usize][(x2 * 2 + radius as isize * 2) as usize] =
-            chars[i * 2 + 1].to_ascii_uppercase();
-    }
-
-    for row in grid {
-        println!("  {}", row.iter().collect::<String>());
-    }
-    println!();
-    print!("  ");
-    for c in found_letters.chars() {
-        if c == '/' {
-            print!("  ");
-        } else if c == '.' {
-            print!("_ ");
-        } else {
-            print!("{} ", c.to_ascii_uppercase());
-        }
-    }
-    println!();
+    ui::display::anagram_helper(found_letters, chars, len);
 }
 
 fn define(word: &str) {
