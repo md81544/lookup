@@ -140,7 +140,7 @@ fn test_regex_lookup() {
         "druid".to_string(),
         "wryly".to_string(),
     ];
-    let mut results : Vec<String> = regex_lookup("d", &words);
+    let mut results: Vec<String> = regex_lookup("d", &words);
     assert!(results.len() == 3);
     results = regex_lookup("k", &words);
     assert!(results.len() == 1);
@@ -173,4 +173,26 @@ fn test_regular_patterns() {
     assert!(result.len() == 2);
     assert!(result[0] == "BONES");
     assert!(result[1] == "RSER");
+}
+
+#[test]
+fn test_remove_found_mismatches() {
+    let words = vec![
+        "knelt".to_string(),
+        "dodge".to_string(),
+        "dryer".to_string(),
+        "druid".to_string(),
+        "wryly".to_string(),
+        "abc def".to_string(),
+        "abcxdef".to_string(),
+    ];
+    let mut found = "d...e".to_string();
+    let mut results = remove_found_mismatches(&words, found, false);
+    assert!(results.len() == 1);
+    found = "ab...ef".to_string();
+    results = remove_found_mismatches(&words, found, false);
+    assert!(results.len() == 2);
+    found = "ab...ef".to_string();
+    results = remove_found_mismatches(&words, found, true); // ignore phrases
+    assert!(results.len() == 1);
 }

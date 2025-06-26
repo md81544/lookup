@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::{
     collections::{HashMap, HashSet},
     process::exit,
@@ -339,3 +340,37 @@ pub fn regular_patterns(search_string: &str, reverse: bool) -> Vec<String> {
     results
 }
 
+pub fn remove_found_mismatches(
+    results: &[String],
+    found: String,
+    exclude_phrases: bool,
+) -> Vec<String> {
+    let found_letters = expand_numbers(&found);
+    let mut new_results: Vec<String> = Vec::new();
+    let mut regex_string = "(?i)^".to_string();
+    for i in 0..found_letters.len() {
+        if found_letters.as_bytes()[i] == b'_' {
+            regex_string.push('.');
+        } else if found_letters.as_bytes()[i] == b'%' {
+            regex_string.push_str(".*");
+            break;
+        } else if found_letters.as_bytes()[i] == b'/' {
+            regex_string.push(' ');
+        } else {
+            regex_string.push(found_letters.as_bytes()[i] as char);
+        }
+    }
+    if !regex_string.contains(".*") {
+        regex_string.push_str(".*");
+    }
+    let re = Regex::new(&regex_string).unwrap();
+    for word in results {
+        if exclude_phrases && word.contains(' ') {
+            continue;
+        }
+        if re.is_match(word) {
+            new_results.push(word.to_string());
+        }
+    }
+    new_results
+}
