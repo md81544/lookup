@@ -4,6 +4,27 @@ use std::{
 };
 
 use itertools::Itertools;
+use rand::{seq::SliceRandom, thread_rng};
+
+pub mod ui;
+
+#[derive(Eq, PartialEq)]
+pub enum Action {
+    Undefined,
+    Wordle,
+    Spellingbee,
+    Panagram,
+    Lookup,
+    Anagram,
+    Jumble,
+    Regex,
+    Thesaurus,
+    LookupWithThesaurus,
+    RegexWithThesaurus,
+    RegularPatterns,
+    Reverse,
+    Remove,
+}
 
 pub fn sort_word(word: &str) -> String {
     // Strip all whitespace
@@ -241,4 +262,41 @@ pub fn regex_lookup(search_string: &str, word_list: &[String]) -> Vec<String> {
         }
     }
     results
+}
+
+pub fn jumble(full_input: &str, found_letters: &str, size: u8) {
+    if size > 0 && size as usize != full_input.len() {
+        println!(
+            "Error: the number of supplied letters ({}) did not match the 'size' argument",
+            full_input.len()
+        );
+        return;
+    }
+    // Remove underscores from found_letters
+    let mut input: String = full_input.to_string();
+    for c in found_letters.chars() {
+        if c != '_' && c != '/' && c != '.' {
+            if let Some(pos) = input.find(c) {
+                input.remove(pos);
+            } else {
+                println!(
+                    "Error: You supplied a letter ({}) in the found (-f) option",
+                    c
+                );
+                println!("which does not appear in the source set of letters");
+                return;
+            }
+        }
+    }
+    println!();
+    let mut chars: Vec<char> = input.chars().collect();
+    if chars.len() % 2 == 1 {
+        chars.push(' ');
+    }
+    let len = chars.len();
+
+    let mut rng = thread_rng();
+    chars.shuffle(&mut rng);
+
+    ui::display::anagram_helper(found_letters, chars, len);
 }

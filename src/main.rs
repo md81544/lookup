@@ -1,7 +1,5 @@
 use clap::{ArgGroup, Parser};
 use colored::Colorize;
-use rand::seq::SliceRandom;
-use rand::thread_rng;
 use regex::Regex;
 use std::collections::HashMap;
 use std::process::exit;
@@ -117,24 +115,6 @@ struct Args {
     /// Remove letters interactively
     #[arg(short, long, default_value_t = false)]
     remove: bool,
-}
-
-#[derive(Eq, PartialEq)]
-pub enum Action {
-    Undefined,
-    Wordle,
-    Spellingbee,
-    Panagram,
-    Lookup,
-    Anagram,
-    Jumble,
-    Regex,
-    Thesaurus,
-    LookupWithThesaurus,
-    RegexWithThesaurus,
-    RegularPatterns,
-    Reverse,
-    Remove,
 }
 
 fn main() {
@@ -432,43 +412,6 @@ fn reverse(search_string: &str) -> Vec<String> {
     let word = search_string.chars().rev().collect::<String>();
     results.push(word);
     results
-}
-
-fn jumble(full_input: &str, found_letters: &str, size: u8) {
-    if size > 0 && size as usize != full_input.len() {
-        println!(
-            "Error: the number of supplied letters ({}) did not match the 'size' argument",
-            full_input.len()
-        );
-        return;
-    }
-    // Remove underscores from found_letters
-    let mut input: String = full_input.to_string();
-    for c in found_letters.chars() {
-        if c != '_' && c != '/' && c != '.' {
-            if let Some(pos) = input.find(c) {
-                input.remove(pos);
-            } else {
-                println!(
-                    "Error: You supplied a letter ({}) in the found (-f) option",
-                    c
-                );
-                println!("which does not appear in the source set of letters");
-                return;
-            }
-        }
-    }
-    println!();
-    let mut chars: Vec<char> = input.chars().collect();
-    if chars.len() % 2 == 1 {
-        chars.push(' ');
-    }
-    let len = chars.len();
-
-    let mut rng = thread_rng();
-    chars.shuffle(&mut rng);
-
-    ui::display::anagram_helper(found_letters, chars, len);
 }
 
 fn define(word: &str) {
