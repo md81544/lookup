@@ -155,7 +155,9 @@ pub mod display {
         }
         execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
         disable_raw_mode().unwrap();
-        println!("{}", removed);
+        if !removed.is_empty() {
+            println!("{}", removed);
+        }
         println!();
     }
 }
