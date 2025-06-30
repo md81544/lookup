@@ -1,3 +1,9 @@
+* Visual flash (or other notification) in -r (interactive remove) as printing a bell character
+  won't always work (when a user enters a letter which doesn't exist in the string)
+
+* "Interactive" jumble using crossterm to re-jumble when space
+  bar is pressed? 
+
 * Allow -f with -r to find words in "in" clues... for example
   -v aldershotcafedemolition -f __/__c__ should return "de facto"
 
