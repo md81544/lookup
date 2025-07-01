@@ -1,3 +1,5 @@
+* Should -f be exact? We could add the % idea as a final wildcard
+
 * Visual flash (or other notification) in -r (interactive remove) as printing a bell character
   won't always work (when a user enters a letter which doesn't exist in the string)
 
