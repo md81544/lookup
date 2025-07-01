@@ -362,7 +362,7 @@ pub fn remove_found_mismatches(
         }
     }
     if !regex_string.contains(".*") {
-        regex_string.push_str(".*");
+        regex_string.push_str("$");
     }
     let re = Regex::new(&regex_string).unwrap();
     for word in results {
