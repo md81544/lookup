@@ -7,8 +7,8 @@ use std::{
 use itertools::Itertools;
 use rand::{seq::SliceRandom, thread_rng};
 
-pub mod ui;
 pub mod file;
+pub mod ui;
 
 #[derive(Eq, PartialEq)]
 pub enum Action {
@@ -274,7 +274,6 @@ pub fn jumble(full_input: &str, found_letters: &str, size: u8) {
         );
         return;
     }
-    // Remove underscores from found_letters
     let mut input: String = full_input.to_string();
     for c in found_letters.chars() {
         if c != '_' && c != '/' && c != '.' {

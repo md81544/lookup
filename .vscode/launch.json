@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["-t", "bird", "-f", "t..."],
+            "args": ["excitations", "-f", "in"],
             "cwd": "${workspaceFolder}"
         },
         {
