@@ -143,7 +143,12 @@ pub fn lookup(search_string: &str, word_list: &[String], exclude: &str) -> Vec<S
     let mut results: HashSet<String> = HashSet::new();
     for word in word_list {
         let mut matched = true;
-        if word.len() != search_string.len() && !search_string.contains('%') {
+        if search_string.contains('%') {
+            let wildcard_pos = search_string.find('%').unwrap();
+            if word.len() < wildcard_pos {
+                continue;
+            }
+        } else if word.len() != search_string.len() {
             continue;
         }
         for i in 0..word.len() {

@@ -319,7 +319,6 @@ fn main() {
     } else if action == Action::Reverse {
         results = reverse(&search_string.to_uppercase());
     }
-
     if !args.found.is_empty() && args.size > 0 {
         results = remove_wrong_sized_words(&results, args.size);
     }

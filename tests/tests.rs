@@ -59,8 +59,19 @@ fn test_lookup() {
     let results4 = lookup("not/c___", &words, "z");
     assert_eq!(results4.len(), 1); // should match "not care"
 }
-#[test]
 
+#[test]
+fn test_lookup_with_wildcard() {
+    let words = vec![
+        "arc".to_string(),
+        "arch".to_string(),
+        "archimedes".to_string(),
+    ];
+    let results = lookup("arch%", &words, "");
+    assert_eq!(results.len(), 2); // should match "arch" and "archimedes" but not shorter words
+}
+
+#[test]
 fn test_lookup_phrase() {
     let words = vec![
         "i feel fine".to_string(),
