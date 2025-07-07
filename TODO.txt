@@ -1,3 +1,8 @@
+* Interactive mode, where you can just type commands, e.g. "def" for define - could be useful for
+  keeping notes too
+
+* 'lu loudbas -f .u -a' doesn't return 'busload' - presumably the -f string needs expanding
+
 * Positional removal in -f (arrows move cursor around?)
 
 * Visual flash (or other notification) in -r (interactive remove) as printing a bell character
