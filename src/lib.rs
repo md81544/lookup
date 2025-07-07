@@ -403,3 +403,21 @@ pub fn define(word: &str) {
         }
     }
 }
+
+pub fn expand_found_string(search_string: &str, found_letters: &str) -> String {
+    // Ensures that the "found" string matches the length of the search string
+    let mut found = found_letters.to_string();
+    if found_letters.len() >= search_string.len() {
+        return found;
+    }
+    let mut wildcards_to_add = search_string.len() - found.len();
+    for c in found.chars() {
+        if c == '/' {
+            wildcards_to_add += 1;
+        }
+    }
+    for _ in 0..wildcards_to_add {
+        found.push('.');
+    }
+    found
+}

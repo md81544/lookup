@@ -238,3 +238,36 @@ fn test_expand_numbers() {
     let result4 = expand_numbers("1024");
     assert!(result4.len() == 1024);
 }
+
+#[test]
+fn test_anagram_with_incomplete_found() {
+    let words = vec![
+        "dodge".to_string(),
+        "dryer".to_string()
+    ];
+    let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
+    // Create the anagram list, note the vec contains indexes
+    // into the word list
+    anagrams.insert("derry".to_string(), vec![1usize]);
+    let results = anagram_search("ryder", &words, &anagrams);
+    assert_eq!(results.len(), 1); // should match "dryer"
+    let found = expand_found_string("ryder", "dr");
+    let results2 = remove_found_mismatches(&results, found, true);
+    assert_eq!(results2.len(), 1);
+}
+
+#[test]
+fn test_anagram_with_multiword_incomplete_found() {
+    let words = vec![
+        "sumo wrestlers".to_string(),
+    ];
+    let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
+    // Create the anagram list, note the vec contains indexes
+    // into the word list
+    anagrams.insert("eelmorrssstuw".to_string(), vec![0usize]);
+    let results = anagram_search("sumsweltersor", &words, &anagrams);
+    assert_eq!(results.len(), 1); // should match "sumo wrestlers"
+    let found = expand_found_string("sumsweltersor", "sum./");
+    let results2 = remove_found_mismatches(&results, found, false);
+    assert_eq!(results2.len(), 1);
+}

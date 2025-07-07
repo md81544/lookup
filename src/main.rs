@@ -324,7 +324,10 @@ fn main() {
     }
 
     if !args.found.is_empty() {
-        results = remove_found_mismatches(&results, args.found, args.excludephrases);
+        // If the found string is smaller than the search_string then
+        // we assume it's an incomplete found string and pad it out
+        let found = expand_found_string(&search_string, &args.found);
+        results = remove_found_mismatches(&results, found, args.excludephrases);
     }
 
     results.sort();

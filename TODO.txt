@@ -1,7 +1,5 @@
 * Interactive mode, where you can just type commands, e.g. "def" for define - could be useful for
-  keeping notes too
-
-* 'lu loudbas -f .u -a' doesn't return 'busload' - presumably the -f string needs expanding
+  keeping notes too. Maybe implement as a second shell program which calls lookup?
 
 * Positional removal in -f (arrows move cursor around?)
 
@@ -9,7 +7,7 @@
   won't always work (when a user enters a letter which doesn't exist in the string)
 
 * "Interactive" jumble using crossterm to re-jumble when space
-  bar is pressed? 
+  bar is pressed?
 
 * Allow -f with -r to find words in "in" clues... for example
   -v aldershotcafedemolition -f __/__c__ should return "de facto"
