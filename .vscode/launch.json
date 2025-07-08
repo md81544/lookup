@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["archim%", "-l"],
+            "args": ["deterapes", "-f", "2s", "-a"],
             "cwd": "${workspaceFolder}"
         },
         {

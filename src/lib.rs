@@ -407,6 +407,7 @@ pub fn define(word: &str) {
 pub fn expand_found_string(search_string: &str, found_letters: &str) -> String {
     // Ensures that the "found" string matches the length of the search string
     let mut found = found_letters.to_string();
+    found = expand_numbers(&found);
     if found_letters.len() >= search_string.len() {
         return found;
     }
