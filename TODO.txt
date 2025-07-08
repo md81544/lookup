@@ -1,3 +1,8 @@
+* 'lu deterapes -f 2s -a' doesn't return 'desperate' but
+'lu deterapes -f ..s -a' does (found string needs number expansion)
+
+* Change debug mode to use full dictionary but be verbose (i.e. show workings)
+
 * Interactive mode, where you can just type commands, e.g. "def" for define - could be useful for
   keeping notes too. Maybe implement as a second shell program which calls lookup?
 
