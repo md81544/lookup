@@ -55,7 +55,12 @@ pub mod display {
         }
     }
 
-    pub fn anagram_helper(found_letters: &str, chars: Vec<char>, len: usize) {
+    pub fn anagram_helper(
+        found_letters: &str,
+        chars: Vec<char>,
+        len: usize,
+        output_type: OutputType,
+    ) {
         use std::f32::consts::PI;
         let radius = ((len as f32 / PI).sqrt().ceil()) as usize;
         let mut grid = vec![vec![' '; radius * 4 + 1]; radius * 2 + 1];
@@ -74,7 +79,15 @@ pub mod display {
             grid[(y2 + radius as isize) as usize][(x2 * 2 + radius as isize * 2) as usize] =
                 chars[i * 2 + 1].to_ascii_uppercase();
         }
-
+        if output_type == OutputType::Json {
+            let mut rows: Vec<String> = Vec::new();
+            for row in grid {
+                rows.push(format!("  {}", row.iter().collect::<String>()));
+            }
+            let json_output = serde_json::to_string(&rows).unwrap();
+            println!("{}", json_output);
+            return;
+        }
         for row in grid {
             println!("  {}", row.iter().collect::<String>());
         }

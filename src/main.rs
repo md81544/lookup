@@ -311,11 +311,20 @@ fn main() {
                 letters.push('_');
             }
         }
+        let mut output_type = OutputType::Normal;
+        if args.json {
+            output_type = OutputType::Json;
+        }
         jumble(
             &search_string.to_uppercase(),
             &letters.to_uppercase(),
             args.size,
+            output_type,
         );
+        if output_type != OutputType::Json {
+            println!();
+        }
+        exit(0);
     } else if action == Action::Thesaurus {
         results = thesaurus;
     } else if action == Action::RegularPatterns {

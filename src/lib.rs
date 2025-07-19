@@ -32,7 +32,7 @@ pub enum Action {
 pub enum OutputType {
     Normal,
     Narrow,
-    Json
+    Json,
 }
 
 pub fn sort_word(word: &str) -> String {
@@ -278,7 +278,7 @@ pub fn regex_lookup(search_string: &str, word_list: &[String]) -> Vec<String> {
     results
 }
 
-pub fn jumble(full_input: &str, found_letters: &str, size: u8) {
+pub fn jumble(full_input: &str, found_letters: &str, size: u8, output_type: OutputType) {
     if size > 0 && size as usize != full_input.len() {
         println!(
             "Error: the number of supplied letters ({}) did not match the 'size' argument",
@@ -301,7 +301,9 @@ pub fn jumble(full_input: &str, found_letters: &str, size: u8) {
             }
         }
     }
-    println!();
+    if output_type != OutputType::Json {
+        println!();
+    }
     let mut chars: Vec<char> = input.chars().collect();
     if chars.len() % 2 == 1 {
         chars.push(' ');
@@ -311,7 +313,7 @@ pub fn jumble(full_input: &str, found_letters: &str, size: u8) {
     let mut rng = thread_rng();
     chars.shuffle(&mut rng);
 
-    ui::display::anagram_helper(found_letters, chars, len);
+    ui::display::anagram_helper(found_letters, chars, len, output_type);
 }
 
 pub fn reverse(search_string: &str) -> Vec<String> {
