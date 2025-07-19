@@ -89,6 +89,10 @@ struct Args {
     #[arg(short = 'D', long, default_value_t = false)]
     debug: bool,
 
+    /// Json output
+    #[arg(short = 'J', long, default_value_t = false)]
+    json: bool,
+
     // Search string
     #[arg()]
     //#[arg(index(1))]
@@ -331,6 +335,13 @@ fn main() {
     }
 
     results.sort();
-    ui::display::show_results(&results, &search_string, action, args.narrow);
+    let mut output_type : OutputType = OutputType::Normal;
+    if args.json {
+        output_type = OutputType::Json;
+    }
+    if args.narrow {
+        output_type = OutputType::Narrow;
+    }
+    ui::display::show_results(&results, &search_string, action, output_type);
     exit(0);
 }

@@ -28,6 +28,13 @@ pub enum Action {
     Remove,
 }
 
+#[derive(Clone, Copy, Eq, PartialEq)]
+pub enum OutputType {
+    Normal,
+    Narrow,
+    Json
+}
+
 pub fn sort_word(word: &str) -> String {
     // Strip all whitespace
     let no_space: String = word.chars().filter(|c| !c.is_whitespace()).collect();

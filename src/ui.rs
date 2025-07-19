@@ -1,11 +1,12 @@
 pub mod display {
 
     use crate::Action;
+    use crate::OutputType;
 
     use colored::Colorize;
 
-    fn print_separator(narrow: bool) {
-        if narrow {
+    fn print_separator(output_type: OutputType) {
+        if output_type == OutputType::Narrow {
             println!();
         } else {
             print!(" ");
@@ -28,10 +29,10 @@ pub mod display {
         results: &Vec<String>,
         search_string: &str,
         action: crate::Action,
-        narrow: bool,
+        output_type: OutputType
     ) {
         for word in results {
-            if word.contains(char::is_whitespace) && !narrow {
+            if word.contains(char::is_whitespace) && output_type != OutputType::Narrow {
                 print!("'");
             }
             if (action == Action::Panagram && word.len() == 9)
@@ -41,10 +42,10 @@ pub mod display {
             } else {
                 print!("{}", word);
             }
-            if word.contains(char::is_whitespace) && !narrow {
+            if word.contains(char::is_whitespace) && output_type != OutputType::Narrow {
                 print!("'");
             }
-            print_separator(narrow);
+            print_separator(output_type);
         }
         println!();
     }
