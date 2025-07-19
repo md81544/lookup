@@ -401,14 +401,23 @@ pub fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
     new_results
 }
 
-pub fn define(word: &str) {
+pub fn define(word: &str, output_type: OutputType) {
     let mut results = vec![];
     file::load::definitions(&mut results, word);
-    if results.is_empty() {
-        println!("No definition found.");
-    } else {
+    if output_type == OutputType::Json {
+        let mut v: Vec<String> = Vec::new();
         for result in results {
-            println!(" * {}", result);
+            v.push(result);
+        }
+        let json_output = serde_json::to_string(&v).unwrap();
+        println!("{}", json_output);
+    } else {
+        if results.is_empty() {
+            println!("No definition found.");
+        } else {
+            for result in results {
+                println!(" * {}", result);
+            }
         }
     }
 }

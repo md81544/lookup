@@ -2,6 +2,7 @@ use clap::{ArgGroup, Parser};
 use colored::Colorize;
 use std::collections::HashMap;
 use std::process::exit;
+use OutputType;
 
 use lookup::*;
 
@@ -133,7 +134,11 @@ fn main() {
 
     if !args.define.is_empty() && !args.define[0].is_empty() {
         let combined = args.define.join(" ").to_lowercase();
-        define(&combined);
+        let mut output_type = OutputType::Normal;
+        if args.json {
+            output_type = OutputType::Json;
+        }
+        define(&combined, output_type);
         exit(0);
     }
 
