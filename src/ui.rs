@@ -29,25 +29,30 @@ pub mod display {
         results: &Vec<String>,
         search_string: &str,
         action: crate::Action,
-        output_type: OutputType
+        output_type: OutputType,
     ) {
-        for word in results {
-            if word.contains(char::is_whitespace) && output_type != OutputType::Narrow {
-                print!("'");
+        if output_type == OutputType::Json {
+            let json_output = serde_json::to_string(&results).unwrap();
+            println!("{}", json_output);
+        } else {
+            for word in results {
+                if word.contains(char::is_whitespace) && output_type != OutputType::Narrow {
+                    print!("'");
+                }
+                if (action == Action::Panagram && word.len() == 9)
+                    || (action == Action::Spellingbee && word_is_anagram(word, search_string))
+                {
+                    print!("{}", word.to_uppercase().bold());
+                } else {
+                    print!("{}", word);
+                }
+                if word.contains(char::is_whitespace) && output_type != OutputType::Narrow {
+                    print!("'");
+                }
+                print_separator(output_type);
             }
-            if (action == Action::Panagram && word.len() == 9)
-                || (action == Action::Spellingbee && word_is_anagram(word, search_string))
-            {
-                print!("{}", word.to_uppercase().bold());
-            } else {
-                print!("{}", word);
-            }
-            if word.contains(char::is_whitespace) && output_type != OutputType::Narrow {
-                print!("'");
-            }
-            print_separator(output_type);
+            println!();
         }
-        println!();
     }
 
     pub fn anagram_helper(found_letters: &str, chars: Vec<char>, len: usize) {

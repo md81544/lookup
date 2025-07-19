@@ -335,12 +335,15 @@ fn main() {
     }
 
     results.sort();
-    let mut output_type : OutputType = OutputType::Normal;
+    let mut output_type: OutputType = OutputType::Normal;
     if args.json {
         output_type = OutputType::Json;
     }
     if args.narrow {
         output_type = OutputType::Narrow;
+    }
+    if args.json {
+        output_type = OutputType::Json;
     }
     ui::display::show_results(&results, &search_string, action, output_type);
     exit(0);

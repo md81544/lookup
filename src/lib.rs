@@ -392,7 +392,7 @@ pub fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
     for word in results {
         let mut w = word.clone();
         remove_whitespace(&mut w);
-        if w.len() == length.into() {
+        if w.len() == <u8 as Into<usize>>::into(length) {
             new_results.push(word.to_string());
         }
     }
