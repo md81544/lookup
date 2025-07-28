@@ -105,10 +105,11 @@ pub mod display {
                 print!("  ");
             } else if c == '.' {
                 print!("_ ");
+                count += 1;
             } else {
                 print!("{} ", c.to_ascii_uppercase());
+                count += 1;
             }
-            count += 1;
         }
         if !letter_count.is_empty() {
             letter_count.push(',');
