@@ -93,16 +93,28 @@ pub mod display {
         }
         println!();
         print!("  ");
+        let mut count = 0;
+        let mut letter_count = String::new();
         for c in found_letters.chars() {
             if c == '/' {
+                if !letter_count.is_empty() {
+                    letter_count.push(',');
+                }
+                letter_count.push_str(&count.to_string());
+                count = 0;
                 print!("  ");
             } else if c == '.' {
                 print!("_ ");
             } else {
                 print!("{} ", c.to_ascii_uppercase());
             }
+            count += 1;
         }
-        println!();
+        if !letter_count.is_empty() {
+            letter_count.push(',');
+        }
+        letter_count.push_str(&count.to_string());
+        println!(" ({})", letter_count);
     }
 
     pub fn interactive_remove(search_string: String) {
