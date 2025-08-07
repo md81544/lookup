@@ -154,7 +154,7 @@ pub mod display {
             }
             execute!(
                 stdout,
-                Print("  (Press esc to quit, space to reset)".to_string()),
+                Print(format!("  ({}) - esc to quit, space to reset", search_string.len())),
                 RestorePosition
             )
             .unwrap();
