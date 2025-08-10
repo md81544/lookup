@@ -34770,6 +34770,8 @@ lemon sorbet
 lemon squash
 lemon squeezer
 lemon tea
+lemon tree
+lemon trees
 lemon verbena
 lemon yellow
 lemon zest
