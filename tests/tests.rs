@@ -228,6 +228,15 @@ fn test_remove_wrong_sized_words() {
 }
 
 #[test]
+fn test_expand_search_string_front_wildcard() {
+    let result = expand_found_string("computer", "%er");
+    // With numbers also:
+    assert!(result == "......er");
+    let result2 = expand_found_string("computer", "%m3er");
+    assert!(result2 == "..m...er");
+}
+
+#[test]
 fn test_expand_numbers() {
     let result = expand_numbers("3e4");
     assert!(result == "___e____");

@@ -304,7 +304,7 @@ fn main() {
         results = regex_lookup(&search_string, &thesaurus);
     } else if action == Action::Jumble {
         let mut letters = args.found.clone();
-        letters = expand_numbers(&letters);
+        letters = expand_found_string(&search_string, &letters);
         // Note we use '/' in the "found" string to indicate word boundaries, e.g. "N_/M_NS/L_ND"
         let letters_no_spaces: String = letters.replace("/", "");
         if !letters_no_spaces.is_empty() && letters_no_spaces.len() > search_string.len() {

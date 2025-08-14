@@ -247,7 +247,7 @@ pub fn expand_numbers(search_string: &str) -> String {
         } else {
             if num != 0 {
                 for _ in 0..num {
-                    res.push('_');
+                    res.push('.');
                 }
             }
             if c == ' ' {
@@ -288,7 +288,7 @@ pub fn jumble(full_input: &str, found_letters: &str, size: u8, output_type: Outp
     }
     let mut input: String = full_input.to_string();
     for c in found_letters.chars() {
-        if c != '_' && c != '/' && c != '.' {
+        if c != '_' && c != '/' && c != '.' && c != '%'{
             if let Some(pos) = input.find(c) {
                 input.remove(pos);
             } else {
@@ -425,7 +425,16 @@ pub fn define(word: &str, output_type: OutputType) {
 pub fn expand_found_string(search_string: &str, found_letters: &str) -> String {
     // Ensures that the "found" string matches the length of the search string
     let mut found = found_letters.to_string();
+    if found.len() == 0 {
+        return found;
+    }
     found = expand_numbers(&found);
+    if found.chars().next() == Some('%') {
+        found.remove(0);
+        for _ in 0..search_string.len() - found.len() {
+            found.insert(0, '.');
+        }
+    }
     if found_letters.len() >= search_string.len() {
         return found;
     }
