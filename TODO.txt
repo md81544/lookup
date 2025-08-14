@@ -1,3 +1,5 @@
+* lu alarmedyes -f %a.y/.e.l. doesn't work right
+
 * Add -n/--notepad option for just entering the found letters and the option to edit it to avoid needing an editor sometimes
 
 * Why does 'lu -s gatefolle' highlight "FLOATAGE" when it only has one "L"?

@@ -234,6 +234,8 @@ fn test_expand_search_string_front_wildcard() {
     assert!(result == "......er");
     let result2 = expand_found_string("computer", "%m3er");
     assert!(result2 == "..m...er");
+    let result3 = expand_found_string("hoptat", "%/h.t");
+    assert!(result3 == ".../h.t");
 }
 
 #[test]

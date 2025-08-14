@@ -288,7 +288,7 @@ pub fn jumble(full_input: &str, found_letters: &str, size: u8, output_type: Outp
     }
     let mut input: String = full_input.to_string();
     for c in found_letters.chars() {
-        if c != '_' && c != '/' && c != '.' && c != '%'{
+        if c != '_' && c != '/' && c != '.' && c != '%' {
             if let Some(pos) = input.find(c) {
                 input.remove(pos);
             } else {
@@ -431,21 +431,25 @@ pub fn expand_found_string(search_string: &str, found_letters: &str) -> String {
     found = expand_numbers(&found);
     if found.chars().next() == Some('%') {
         found.remove(0);
-        for _ in 0..search_string.len() - found.len() {
+        let f = found.replace('/', "");
+        for _ in 0..search_string.len() - f.len() {
             found.insert(0, '.');
         }
     }
     if found_letters.len() >= search_string.len() {
         return found;
     }
-    let mut wildcards_to_add = search_string.len() - found.len();
-    for c in found.chars() {
-        if c == '/' {
-            wildcards_to_add += 1;
+    // Add any required trailing wildcards
+    if search_string.len() > found.len() {
+        let mut wildcards_to_add = search_string.len() - found.len();
+        for c in found.chars() {
+            if c == '/' {
+                wildcards_to_add += 1;
+            }
         }
-    }
-    for _ in 0..wildcards_to_add {
-        found.push('.');
+        for _ in 0..wildcards_to_add {
+            found.push('.');
+        }
     }
     found
 }
