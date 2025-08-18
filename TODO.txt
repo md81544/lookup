@@ -1,3 +1,5 @@
+* lu piousposse -f i/suppose/ -a doesn't return "i suppose so"
+
 * lu alarmedyes -f %a.y/.e.l. doesn't work right
 
 * Add -n/--notepad option for just entering the found letters and the option to edit it to avoid needing an editor sometimes
