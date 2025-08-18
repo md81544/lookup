@@ -260,7 +260,7 @@ pub fn expand_numbers(search_string: &str) -> String {
     }
     if num != 0 {
         for _ in 0..num {
-            res.push('_');
+            res.push('.');
         }
     }
     res
@@ -436,11 +436,12 @@ pub fn expand_found_string(search_string: &str, found_letters: &str) -> String {
             found.insert(0, '.');
         }
     }
-    if found_letters.len() >= search_string.len() {
+    let nospace_found = found.replace('/', "");
+    if nospace_found.len() >= search_string.len() {
         return found;
     }
     // Add any required trailing wildcards
-    if search_string.len() > found.len() {
+    if search_string.len() > nospace_found.len() {
         let mut wildcards_to_add = search_string.len() - found.len();
         for c in found.chars() {
             if c == '/' {

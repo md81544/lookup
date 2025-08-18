@@ -133,13 +133,13 @@ fn test_yellow_check() {
 fn test_number_expansion() {
     let mut ss1 = "3f3".to_string();
     ss1 = expand_numbers(&ss1);
-    assert_eq!(ss1, "___f___");
+    assert_eq!(ss1, "...f...");
     let mut ss2 = "3/x5".to_string();
     ss2 = expand_numbers(&ss2);
-    assert_eq!(ss2, "___/x_____");
+    assert_eq!(ss2, ".../x.....");
     let mut ss3 = "11/z4".to_string();
     ss3 = expand_numbers(&ss3);
-    assert_eq!(ss3, "___________/z____");
+    assert_eq!(ss3, ".........../z....");
 }
 
 #[test]
@@ -241,11 +241,11 @@ fn test_expand_search_string_front_wildcard() {
 #[test]
 fn test_expand_numbers() {
     let result = expand_numbers("3e4");
-    assert!(result == "___e____");
+    assert!(result == "...e....");
     let result2 = expand_numbers("14x");
-    assert!(result2 == "______________x");
+    assert!(result2 == "..............x");
     let result3 = expand_numbers("15");
-    assert!(result3 == "_______________");
+    assert!(result3 == "...............");
     let result4 = expand_numbers("1024");
     assert!(result4.len() == 1024);
 }
@@ -279,6 +279,22 @@ fn test_anagram_with_multiword_incomplete_found() {
     let results = anagram_search("sumsweltersor", &words, &anagrams);
     assert_eq!(results.len(), 1); // should match "sumo wrestlers"
     let found = expand_found_string("sumsweltersor", "sum./");
+    let results2 = remove_found_mismatches(&results, found, false);
+    assert_eq!(results2.len(), 1);
+}
+
+#[test]
+fn test_anagram_with_multiword_incomplete_found2() {
+    let words = vec![
+        "i suppose so".to_string(),
+    ];
+    let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
+    // Create the anagram list, note the vec contains indexes
+    // into the word list
+    anagrams.insert("eiooppsssu".to_string(), vec![0usize]);
+    let results = anagram_search("piousposse", &words, &anagrams);
+    assert_eq!(results.len(), 1); // should match "i suppose so"
+    let found = expand_found_string("piousposse", "i/suppose/");
     let results2 = remove_found_mismatches(&results, found, false);
     assert_eq!(results2.len(), 1);
 }
