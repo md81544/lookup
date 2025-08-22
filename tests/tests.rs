@@ -298,3 +298,12 @@ fn test_anagram_with_multiword_incomplete_found2() {
     let results2 = remove_found_mismatches(&results, found, false);
     assert_eq!(results2.len(), 1);
 }
+
+#[test]
+fn test_word_contains_all_letters() {
+    assert!(ui::display::word_contains_all_letters("SEAT", "ASSET") == false);
+    assert!(ui::display::word_contains_all_letters("TASTE", "ASSET") == false);
+    assert!(ui::display::word_contains_all_letters("SETAS", "ASSET") == true);
+    assert!(ui::display::word_contains_all_letters("LEGATE", "GATEFOLLE") == false);
+    assert!(ui::display::word_contains_all_letters("RELET", "TELLER") == false);
+}

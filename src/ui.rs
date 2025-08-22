@@ -13,14 +13,20 @@ pub mod display {
         }
     }
 
-    fn word_is_anagram(word: &str, search_string: &str) -> bool {
-        if word.len() != search_string.len() {
+    pub fn word_contains_all_letters(word: &str, search_string: &str) -> bool {
+        if word.len() < search_string.len() {
             return false;
         }
-        let mut w = word.to_string();
-        for c in search_string.chars() {
-            if let Some(pos) = w.find(c) {
-                w.remove(pos);
+        // Multiple letters the same are allowed, so for instance
+        // if search_string is "EATS", a word of "TASTE" should return true
+        // (this is for "spelling bee" where a letter can be used more than
+        // once to construct answers)
+        // What about if the search_string contains multiple letters? E.g.
+        // search_string = "TELLER", then the word "RELET" shouldn't match.
+        let mut ss = search_string.to_string();
+        for c in word.chars() {
+            if let Some(pos) = ss.find(c) {
+                ss.remove(pos);
             } else {
                 return false;
             }
@@ -43,7 +49,8 @@ pub mod display {
                     print!("'");
                 }
                 if (action == Action::Panagram && word.len() == 9)
-                    || (action == Action::Spellingbee && word_is_anagram(word, search_string))
+                    || (action == Action::Spellingbee
+                        && word_contains_all_letters(word, search_string))
                 {
                     print!("{}", word.to_uppercase().bold());
                 } else {
@@ -157,7 +164,10 @@ pub mod display {
             }
             execute!(
                 stdout,
-                Print(format!("  ({}) - esc to quit, space to reset", search_string.len())),
+                Print(format!(
+                    "  ({}) - esc to quit, space to reset",
+                    search_string.len()
+                )),
                 RestorePosition
             )
             .unwrap();
