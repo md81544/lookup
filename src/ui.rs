@@ -14,11 +14,14 @@ pub mod display {
     }
 
     fn word_is_anagram(word: &str, search_string: &str) -> bool {
-        if word.len() < 7 {
+        if word.len() != search_string.len() {
             return false;
         }
+        let mut w = word.to_string();
         for c in search_string.chars() {
-            if !word.contains(c) {
+            if let Some(pos) = w.find(c) {
+                w.remove(pos);
+            } else {
                 return false;
             }
         }

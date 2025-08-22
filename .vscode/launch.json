@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["deterapes", "-f", "2s", "-a"],
+            "args": ["-s", "gatefolle"],
             "cwd": "${workspaceFolder}"
         },
         {

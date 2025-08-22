@@ -2,8 +2,6 @@
 
 * Add -n/--notepad option for just entering the found letters and the option to edit it to avoid needing an editor sometimes
 
-* Why does 'lu -s gatefolle' highlight "FLOATAGE" when it only has one "L"?
-
 * Change debug mode to use full dictionary but be verbose (i.e. show workings)
 
 * Interactive mode, where you can just type commands, e.g. "def" for define - could be useful for
