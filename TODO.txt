@@ -1,3 +1,5 @@
+* Make "cheaty" flags uppercase
+
 * % should work after word separator ('/')
 
 * Add -n/--notepad option for just entering the found letters and the option to edit it to avoid needing an editor sometimes
