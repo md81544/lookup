@@ -17460,6 +17460,7 @@ due west
 duff information
 duffel bag
 duffel coat
+duffle coat
 dug a hole
 dug in
 dug out
@@ -59883,8 +59884,8 @@ stroke of the pen
 stroke play
 strong argument
 strong arm
-strong arms
 strong arm tactics
+strong arms
 strong as a lion
 strong as an ox
 strong contender
