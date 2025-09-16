@@ -1,7 +1,5 @@
 * Maybe make use of definitions for thesaurus lookup? E.g. any definition which contains, say, 'horse' in the definition
 
-* Make "cheaty" flags uppercase (or long-form only?)
-
 * % should work after word separator ('/')
     - and also inline, so e.g. s%es could match 'stresses'
       (would need size parameter)

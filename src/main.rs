@@ -25,16 +25,16 @@ pub mod ui;
 // (see https://docs.rs/clap/latest/clap/_derive/_tutorial/index.html)
 struct Args {
     /// "Panagram" search (Telegraph Puzzles). Put the mandatory letter first in the search string.
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short = 'P', long, default_value_t = false)]
     panagram: bool,
 
     /// "Spelling Bee" search (NYT Puzzles). Put the mandatory letter first in the search string.
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short = 'S', long, default_value_t = false)]
     spellingbee: bool,
 
     /// "Wordle" search (NYT Puzzles). Use, e.g. k____ to signify K is "green", use -i to include
     /// "yellow" letters, and -x to exclude "grey" letters
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short = 'W', long, default_value_t = false)]
     wordle: bool,
 
     /// Thesaurus lookup. Can be combined with lookup to filter results: use BOTH -l and -t flags.
@@ -46,7 +46,7 @@ struct Args {
     define: Vec<String>,
 
     /// Plain anagram solver
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short = 'A', long, default_value_t = false)]
     anagram: bool,
 
     /// Regex lookup - best single quoted, normally you will need ^/$ at beginning/end
@@ -63,7 +63,7 @@ struct Args {
 
     /// Lookup partial match, e.g. "c_mp_t_r" would yield "computer". You can also look up
     /// phrases, for example "l_k_ m_g_c" would match "like magic".
-    #[arg(short, long, default_value_t = false)]
+    #[arg(short = 'L', long, default_value_t = false)]
     lookup: bool,
 
     /// Word size (number of characters)
