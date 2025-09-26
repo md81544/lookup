@@ -1,3 +1,8 @@
+* 'lu -t sleep -f s' doesn't return 'siesta' but '-f s.e.t.' does - the find option should perhaps work so anything starting with 's' is matched?
+    - -z size flag doesn't help
+
+* Add word length in display of -v (reverse)
+
 * Maybe make use of definitions for thesaurus lookup? E.g. any definition which contains, say, 'horse' in the definition
 
 * % should work after word separator ('/')
