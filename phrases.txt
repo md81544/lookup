@@ -3321,6 +3321,7 @@ anglo saxons
 angora cat
 angora goat
 angora rabbit
+angora wool
 angostura bitters
 angry young man
 angry young men
