@@ -2685,6 +2685,7 @@ all action
 all action hero
 all alone
 all along
+all along the line
 all american
 all american hero
 all and sundry
