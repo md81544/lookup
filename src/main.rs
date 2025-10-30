@@ -341,7 +341,7 @@ fn main() {
         results = remove_wrong_sized_words(&results, args.size);
     }
 
-    if !args.found.is_empty() {
+    if !args.found.is_empty() && !search_string.is_empty(){
         // If the found string is smaller than the search_string then
         // we assume it's an incomplete found string and pad it out
         let found = expand_found_string(&search_string, &args.found);

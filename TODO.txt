@@ -3,6 +3,10 @@
 * 'lu -t sleep -f s' doesn't return 'siesta' but '-f s.e.t.' does - the find option should perhaps work so anything starting with 's' is matched?
     - -z size flag doesn't help
 
+* Further to the previous point, -t should work with -z, so for
+  example 'lu -t reserved -z 3' should only list three-letter
+  words
+
 * Add word length in display of -v (reverse)
 
 * Maybe make use of definitions for thesaurus lookup? E.g. any definition which contains, say, 'horse' in the definition
