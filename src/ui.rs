@@ -2,6 +2,7 @@ pub mod display {
 
     use crate::Action;
     use crate::OutputType;
+    use std::collections::HashSet;
 
     use colored::Colorize;
 
@@ -13,25 +14,34 @@ pub mod display {
         }
     }
 
-    pub fn word_contains_all_letters(word: &str, search_string: &str) -> bool {
-        if word.len() < search_string.len() {
+    pub fn word_contains_all_letters(word: &str, letter_set: &str) -> bool {
+        if word.len() < letter_set.len() {
             return false;
         }
         // Multiple letters the same are allowed, so for instance
         // if search_string is "EATS", a word of "TASTE" should return true
         // (this is for "spelling bee" where a letter can be used more than
         // once to construct answers)
-        // What about if the search_string contains multiple letters? E.g.
-        // search_string = "TELLER", then the word "RELET" shouldn't match.
-        let mut ss = search_string.to_string();
+        let mut ls = letter_set.to_string();
+        let mut found_chars: HashSet<char> = HashSet::new();
         for c in word.chars() {
-            if let Some(pos) = ss.find(c) {
-                ss.remove(pos);
+            if let Some(pos) = ls.find(c) {
+                ls.remove(pos);
+                found_chars.insert(c);
             } else {
-                return false;
+                if !found_chars.contains(&c) {
+                    return false;
+                }
             }
         }
-        true
+        // Finally, did we use all the letters in the letter_set?
+        // For instance "ASSET" shouldn't match letter_set "TASTE"
+        // because both Ts were not used
+        if ls.is_empty() {
+            true
+        } else {
+            false
+        }
     }
 
     pub fn show_results(

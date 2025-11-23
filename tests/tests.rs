@@ -252,10 +252,7 @@ fn test_expand_numbers() {
 
 #[test]
 fn test_anagram_with_incomplete_found() {
-    let words = vec![
-        "dodge".to_string(),
-        "dryer".to_string()
-    ];
+    let words = vec!["dodge".to_string(), "dryer".to_string()];
     let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
     // Create the anagram list, note the vec contains indexes
     // into the word list
@@ -269,9 +266,7 @@ fn test_anagram_with_incomplete_found() {
 
 #[test]
 fn test_anagram_with_multiword_incomplete_found() {
-    let words = vec![
-        "sumo wrestlers".to_string(),
-    ];
+    let words = vec!["sumo wrestlers".to_string()];
     let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
     // Create the anagram list, note the vec contains indexes
     // into the word list
@@ -285,9 +280,7 @@ fn test_anagram_with_multiword_incomplete_found() {
 
 #[test]
 fn test_anagram_with_multiword_incomplete_found2() {
-    let words = vec![
-        "i suppose so".to_string(),
-    ];
+    let words = vec!["i suppose so".to_string()];
     let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
     // Create the anagram list, note the vec contains indexes
     // into the word list
@@ -301,9 +294,12 @@ fn test_anagram_with_multiword_incomplete_found2() {
 
 #[test]
 fn test_word_contains_all_letters() {
-    assert!(ui::display::word_contains_all_letters("SEAT", "ASSET") == false);
-    assert!(ui::display::word_contains_all_letters("TASTE", "ASSET") == false);
-    assert!(ui::display::word_contains_all_letters("SETAS", "ASSET") == true);
-    assert!(ui::display::word_contains_all_letters("LEGATE", "GATEFOLLE") == false);
-    assert!(ui::display::word_contains_all_letters("RELET", "TELLER") == false);
+    // Note, first parameter is the word we're checking, and the second
+    // is the set of letters we're checking against
+    assert!(ui::display::word_contains_all_letters("ASSET", "SEAT") == true);
+    assert!(ui::display::word_contains_all_letters("ASSET", "TASTE") == false); // T not used twice
+    assert!(ui::display::word_contains_all_letters("ASSET", "SETAS") == true);
+    assert!(ui::display::word_contains_all_letters("GATEFOLLE", "LEGATE") == false);
+    assert!(ui::display::word_contains_all_letters("TELLER", "RELET") == true);
+    assert!(ui::display::word_contains_all_letters("OUTWITTING", "OUTWING") == true);
 }
