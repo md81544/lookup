@@ -278,14 +278,23 @@ pub mod display {
             let mut quit = false;
             loop {
                 println!();
-                println!("Search string: {}", search_string);
+                println!("Search string: {} ({})", search_string, search_string.len());
                 if found_string.len() > 0 {
                     println!("Found letters: {}", found_string);
                 }
                 if comment.len() > 0 {
                     println!("Comment: {}", comment);
                 }
-                println!("\nMenu: [J]umble [F]ound [R]emove [C]omment re[S]tart [Q]uit");
+                println!(
+                    "\nMenu: {}umble {}ound {}emove {}omment re{}tart {}ore {}uit",
+                    "J".yellow(),
+                    "F".yellow(),
+                    "R".yellow(),
+                    "C".yellow(),
+                    "S".yellow(),
+                    "M".yellow(),
+                    "Q".yellow()
+                );
                 match get_key() {
                     'J' => {
                         let mut letters = ".".to_string();
@@ -304,6 +313,14 @@ pub mod display {
                     'F' => {
                         found_string = input_string("Enter found letters: ");
                         found_string = expand_found_string(&search_string, &found_string);
+                        let letters_no_spaces: String = found_string.replace("/", "");
+                        if !letters_no_spaces.is_empty()
+                            && letters_no_spaces.len() > search_string.len()
+                        {
+                            print!("{}", "ERROR: ".bold());
+                            println!("'found' letters must be same length as search string");
+                            found_string.clear();
+                        }
                     }
                     'R' => {
                         interactive_remove(search_string.clone());
@@ -316,8 +333,10 @@ pub mod display {
                         break;
                     }
                     'S' => {
+                        println!("\n");
                         break;
                     }
+                    // TODO: add a "more" menu option
                     _ => {
                         // do nothing
                     }
