@@ -1,5 +1,6 @@
 pub mod display {
 
+    use crate::jumble;
     use crate::Action;
     use crate::OutputType;
     use std::collections::HashSet;
@@ -214,5 +215,104 @@ pub mod display {
             println!("{}", removed);
         }
         println!();
+    }
+
+    fn get_key() -> char {
+        use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+        use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
+        let rc: char;
+        let _ = enable_raw_mode();
+        loop {
+            if let Event::Key(KeyEvent { code, kind, .. }) = event::read().unwrap() {
+                if kind == KeyEventKind::Press {
+                    if code == KeyCode::Esc {
+                        rc = 'q';
+                        break;
+                    }
+                    let c = code.as_char();
+                    if c.is_some() {
+                        let c = code.as_char().unwrap().to_ascii_uppercase();
+                        rc = c;
+                        break;
+                    }
+                }
+            }
+        }
+        let _ = disable_raw_mode();
+        rc
+    }
+
+    fn input_string(prompt: &str) -> String {
+        use rustyline::error::ReadlineError;
+        let mut rl = rustyline::DefaultEditor::new().unwrap();
+        let mut rc = "".to_string();
+        let readline = rl.readline(prompt);
+        match readline {
+            Ok(line) => {
+                rl.add_history_entry(line.as_str()).unwrap();
+                rc = line.to_uppercase();
+                return rc;
+            }
+            Err(ReadlineError::Interrupted) => {
+                return rc;
+            }
+            Err(ReadlineError::Eof) => {
+                return rc;
+            }
+            Err(err) => {
+                println!("Error: {:?}", err);
+                return rc;
+            }
+        }
+    }
+
+    pub fn tui() -> Result<(), rustyline::error::ReadlineError> {
+        use crate::expand_found_string;
+        loop {
+            let search_string = input_string("Enter search string: ");
+            let mut found_string = "".to_string();
+            let mut quit = false;
+            loop {
+                println!();
+                println!("Search string: {}", search_string);
+                if found_string.len() > 0 {
+                    println!("Found letters: {}", found_string);
+                }
+                println!(
+                    "\nOptions: [J]umble [F]ound [R]emove [A]nagram [D]efine Re[S]tart [Q]uit"
+                );
+                match get_key() {
+                    'J' => {
+                        let mut letters = ".".to_string();
+                        if found_string.len() > 0 {
+                            letters = found_string.clone();
+                        }else{
+                            letters = expand_found_string(&search_string, &letters);
+                        }
+                        jumble(
+                            &search_string,
+                            &letters,
+                            search_string.len() as u8,
+                            OutputType::Normal,
+                        );
+                    }
+                    'F' => {
+                        found_string = input_string("Enter found letters: ");
+                        found_string = expand_found_string(&search_string, &found_string);
+                    }
+                    'Q' => {
+                        quit = true;
+                        break;
+                    }
+                    _ => {
+                        break;
+                    }
+                }
+            }
+            if quit {
+                break;
+            }
+        }
+        Ok(())
     }
 }

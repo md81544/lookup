@@ -122,6 +122,12 @@ struct Args {
 }
 
 fn main() {
+    // If no arguments provided, use TUI:
+    if std::env::args_os().len() == 1 {
+        let _ = ui::display::tui();
+        exit(0);
+    }
+
     use clap::CommandFactory;
     let mut cmd = Args::command();
     let args = Args::parse();
@@ -340,7 +346,7 @@ fn main() {
     if args.size > 0 {
         results = remove_wrong_sized_words(&results, args.size);
     }
-    if !args.found.is_empty() && !search_string.is_empty(){
+    if !args.found.is_empty() && !search_string.is_empty() {
         // If the found string is smaller than the search_string then
         // we assume it's an incomplete found string and pad it out
         let found = expand_found_string(&search_string, &args.found);
