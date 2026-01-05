@@ -270,7 +270,11 @@ pub mod display {
         use crate::expand_found_string;
         loop {
             let search_string = input_string("Enter search string: ");
+            if search_string.len() == 0 {
+                break;
+            }
             let mut found_string = "".to_string();
+            let mut comment = "".to_string();
             let mut quit = false;
             loop {
                 println!();
@@ -278,15 +282,16 @@ pub mod display {
                 if found_string.len() > 0 {
                     println!("Found letters: {}", found_string);
                 }
-                println!(
-                    "\nOptions: [J]umble [F]ound [R]emove [A]nagram [D]efine Re[S]tart [Q]uit"
-                );
+                if comment.len() > 0 {
+                    println!("Comment: {}", comment);
+                }
+                println!("\nMenu: [J]umble [F]ound [R]emove [C]omment re[S]tart [Q]uit");
                 match get_key() {
                     'J' => {
                         let mut letters = ".".to_string();
                         if found_string.len() > 0 {
                             letters = found_string.clone();
-                        }else{
+                        } else {
                             letters = expand_found_string(&search_string, &letters);
                         }
                         jumble(
@@ -300,12 +305,21 @@ pub mod display {
                         found_string = input_string("Enter found letters: ");
                         found_string = expand_found_string(&search_string, &found_string);
                     }
+                    'R' => {
+                        interactive_remove(search_string.clone());
+                    }
+                    'C' => {
+                        comment = input_string("Enter comment: ");
+                    }
                     'Q' => {
                         quit = true;
                         break;
                     }
-                    _ => {
+                    'S' => {
                         break;
+                    }
+                    _ => {
+                        // do nothing
                     }
                 }
             }
