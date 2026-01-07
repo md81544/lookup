@@ -244,7 +244,15 @@ pub mod display {
 
     fn input_string(prompt: &str) -> String {
         use rustyline::error::ReadlineError;
-        let mut rl = rustyline::DefaultEditor::new().unwrap();
+        use std::sync::{Mutex, OnceLock};
+        // rustyline::DefaultEditor is implemented as a static here to enable
+        // history:
+        static RL: OnceLock<Mutex<rustyline::DefaultEditor>> = OnceLock::new();
+        RL.get_or_init(|| Mutex::new(rustyline::DefaultEditor::new().unwrap()));
+        let mut rl = RL
+            .get_or_init(|| Mutex::new(rustyline::DefaultEditor::new().unwrap()))
+            .lock()
+            .unwrap();
         let mut rc = "".to_string();
         let readline = rl.readline(prompt);
         match readline {
