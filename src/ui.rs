@@ -352,7 +352,8 @@ pub mod display {
                         'M' => {
                             if !more_printed {
                                 println!(
-                                    "      {}nagram {}ookup {}efine re{}erse re{}ular",
+                                    "      {}hesaurus {}nagram {}ookup {}efine re{}erse re{}ular",
+                                    "T".yellow(),
                                     "A".yellow(),
                                     "L".yellow(),
                                     "D".yellow(),
@@ -361,6 +362,10 @@ pub mod display {
                                 );
                                 more_printed = true;
                             }
+                        }
+                        'T' => {
+                            println!("Thesaurus: {}", "TODO".white().bold());
+                            break;
                         }
                         'A' => {
                             println!("Anagram: {}", "TODO".white().bold());
