@@ -276,15 +276,14 @@ pub mod display {
 
     pub fn tui() -> Result<(), rustyline::error::ReadlineError> {
         use crate::expand_found_string;
-        loop {
+        'outer: loop {
             let search_string = input_string("Enter search string: ");
             if search_string.len() == 0 {
                 break;
             }
             let mut found_string = "".to_string();
             let mut comment = "".to_string();
-            let mut quit = false;
-            loop {
+            'restart: loop {
                 println!();
                 println!("Search string: {} ({})", search_string, search_string.len());
                 if found_string.len() > 0 {
@@ -293,6 +292,7 @@ pub mod display {
                 if comment.len() > 0 {
                     println!("Comment: {}", comment);
                 }
+                let mut more_printed = false;
                 println!(
                     "\nMenu: {}umble {}ound {}emove {}omment re{}tart {}ore {}uit",
                     "J".yellow(),
@@ -303,55 +303,89 @@ pub mod display {
                     "M".yellow(),
                     "Q".yellow()
                 );
-                match get_key() {
-                    'J' => {
-                        let mut letters = ".".to_string();
-                        if found_string.len() > 0 {
-                            letters = found_string.clone();
-                        } else {
-                            letters = expand_found_string(&search_string, &letters);
+                loop {
+                    match get_key() {
+                        'J' => {
+                            let mut letters = ".".to_string();
+                            if found_string.len() > 0 {
+                                letters = found_string.clone();
+                            } else {
+                                letters = expand_found_string(&search_string, &letters);
+                            }
+                            jumble(
+                                &search_string,
+                                &letters,
+                                search_string.len() as u8,
+                                OutputType::Normal,
+                            );
+                            break;
                         }
-                        jumble(
-                            &search_string,
-                            &letters,
-                            search_string.len() as u8,
-                            OutputType::Normal,
-                        );
-                    }
-                    'F' => {
-                        found_string = input_string("Enter found letters: ");
-                        found_string = expand_found_string(&search_string, &found_string);
-                        let letters_no_spaces: String = found_string.replace("/", "");
-                        if !letters_no_spaces.is_empty()
-                            && letters_no_spaces.len() > search_string.len()
-                        {
-                            print!("{}", "ERROR: ".bold());
-                            println!("'found' letters must be same length as search string");
-                            found_string.clear();
+                        'F' => {
+                            found_string = input_string("Enter found letters: ");
+                            found_string = expand_found_string(&search_string, &found_string);
+                            let letters_no_spaces: String = found_string.replace("/", "");
+                            if !letters_no_spaces.is_empty()
+                                && letters_no_spaces.len() > search_string.len()
+                            {
+                                print!("{}", "ERROR: ".bold());
+                                println!("'found' letters must be same length as search string");
+                                found_string.clear();
+                            }
+                            break;
                         }
-                    }
-                    'R' => {
-                        interactive_remove(search_string.clone());
-                    }
-                    'C' => {
-                        comment = input_string("Enter comment: ");
-                    }
-                    'Q' => {
-                        quit = true;
-                        break;
-                    }
-                    'S' => {
-                        println!("\n");
-                        break;
-                    }
-                    // TODO: add a "more" menu option
-                    _ => {
-                        // do nothing
+                        'R' => {
+                            interactive_remove(search_string.clone());
+                            break;
+                        }
+                        'C' => {
+                            comment = input_string("Enter comment: ");
+                            break;
+                        }
+                        'Q' => {
+                            break 'outer;
+                        }
+                        'S' => {
+                            println!("\n");
+                            break 'restart;
+                        }
+                        'M' => {
+                            if !more_printed {
+                                println!(
+                                    "      {}nagram {}ookup {}efine re{}erse re{}ular",
+                                    "A".yellow(),
+                                    "L".yellow(),
+                                    "D".yellow(),
+                                    "V".yellow(),
+                                    "G".yellow(),
+                                );
+                                more_printed = true;
+                            }
+                        }
+                        'A' => {
+                            println!("Anagram: {}", "TODO".white().bold());
+                            break;
+                        }
+                        'L' => {
+                            println!("Lookup: {}", "TODO".white().bold());
+                            break;
+                        }
+                        'D' => {
+                            println!("Define: {}", "TODO".white().bold());
+                            break;
+                        }
+                        'V' => {
+                            println!("Reverse: {}", "TODO".white().bold());
+                            break;
+                        }
+                        'G' => {
+                            println!("Regular: {}", "TODO".white().bold());
+                            break;
+                        }
+                        _ => {
+                            // do nothing
+                        }
                     }
                 }
-            }
-            if quit {
-                break;
             }
         }
         Ok(())
