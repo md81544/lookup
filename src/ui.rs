@@ -1,6 +1,7 @@
 pub mod display {
 
     use crate::jumble;
+    use crate::define;
     use crate::Action;
     use crate::OutputType;
     use std::collections::HashSet;
@@ -370,7 +371,8 @@ pub mod display {
                             break;
                         }
                         'D' => {
-                            println!("Define: {}", "TODO".white().bold());
+                            println!("Define: {}", search_string.white().bold());
+                            define(&search_string, OutputType::Normal);
                             break;
                         }
                         'V' => {

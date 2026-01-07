@@ -403,7 +403,7 @@ pub fn remove_wrong_sized_words(results: &[String], length: u8) -> Vec<String> {
 
 pub fn define(word: &str, output_type: OutputType) {
     let mut results = vec![];
-    file::load::definitions(&mut results, word);
+    file::load::definitions(&mut results, &word.to_ascii_lowercase());
     if output_type == OutputType::Json {
         let mut v: Vec<String> = Vec::new();
         for result in results {
