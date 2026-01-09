@@ -1,7 +1,7 @@
 pub mod display {
 
-    use crate::jumble;
     use crate::define;
+    use crate::jumble;
     use crate::Action;
     use crate::OutputType;
     use std::collections::HashSet;
@@ -243,7 +243,7 @@ pub mod display {
         rc
     }
 
-    fn input_string(prompt: &str) -> String {
+    fn input_string(prompt: &str, default: Option<&str>) -> String {
         use rustyline::error::ReadlineError;
         use std::sync::{Mutex, OnceLock};
         // rustyline::DefaultEditor is implemented as a static here to enable
@@ -255,7 +255,12 @@ pub mod display {
             .lock()
             .unwrap();
         let mut rc = "".to_string();
-        let readline = rl.readline(prompt);
+        let readline;
+        if default.is_none() {
+            readline = rl.readline(prompt);
+        } else {
+            readline = rl.readline_with_initial(prompt, (default.unwrap(), ""));
+        }
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_str()).unwrap();
@@ -278,7 +283,7 @@ pub mod display {
     pub fn tui() -> Result<(), rustyline::error::ReadlineError> {
         use crate::expand_found_string;
         'outer: loop {
-            let search_string = input_string("Enter search string: ");
+            let search_string = input_string("Enter search string: ", Some(""));
             if search_string.len() == 0 {
                 break;
             }
@@ -287,8 +292,19 @@ pub mod display {
             'restart: loop {
                 println!();
                 println!("Search string: {} ({})", search_string, search_string.len());
+                if found_string.len() == 0 {
+                    found_string = expand_found_string(&search_string, ".");
+                }
                 if found_string.len() > 0 {
-                    println!("Found letters: {}", found_string);
+                    print!("Found letters: ");
+                    for c in found_string.chars() {
+                        if c == '.' {
+                            print!("_ ");
+                        } else {
+                            print!("{} ", c);
+                        }
+                    }
+                    println!();
                 }
                 if comment.len() > 0 {
                     println!("Comment: {}", comment);
@@ -322,7 +338,8 @@ pub mod display {
                             break;
                         }
                         'F' => {
-                            found_string = input_string("Enter found letters: ");
+                            found_string =
+                                input_string("Enter found letters: ", Some(&found_string));
                             found_string = expand_found_string(&search_string, &found_string);
                             let letters_no_spaces: String = found_string.replace("/", "");
                             if !letters_no_spaces.is_empty()
@@ -339,14 +356,14 @@ pub mod display {
                             break;
                         }
                         'C' => {
-                            comment = input_string("Enter comment: ");
+                            comment = input_string("Enter comment: ", Some(""));
                             break;
                         }
                         'Q' => {
                             break 'outer;
                         }
                         'S' => {
-                            println!("\n");
+                            println!("\n________\n");
                             break 'restart;
                         }
                         'M' => {
