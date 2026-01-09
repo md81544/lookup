@@ -1,12 +1,16 @@
 pub mod display {
 
+    use crate::anagram_search;
     use crate::define;
+    use crate::file;
     use crate::file::load::thesaurus;
     use crate::jumble;
+    use crate::lookup;
     use crate::regular_patterns;
     use crate::reverse;
     use crate::Action;
     use crate::OutputType;
+    use std::collections::HashMap;
     use std::collections::HashSet;
 
     use colored::Colorize;
@@ -399,11 +403,47 @@ pub mod display {
                             break;
                         }
                         'A' => {
-                            println!("Anagram: {}", "TODO".white().bold());
+                            println!("Anagram: {}", search_string.white().bold());
+                            let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
+                            let mut word_list: Vec<String> = Vec::new();
+                            let file_name = "./words_3.txt";
+                            let mut vec_index: usize = 0usize;
+                            file::load::full_list(
+                                &mut word_list,
+                                &mut anagrams,
+                                &file_name,
+                                &mut vec_index,
+                            );
+                            let results = anagram_search(
+                                &search_string.to_ascii_lowercase(),
+                                &word_list,
+                                &anagrams,
+                            );
+                            for s in results {
+                                println!("* {}", s.yellow());
+                            }
                             break;
                         }
                         'L' => {
-                            println!("Lookup: {}", "TODO".white().bold());
+                            println!("Lookup: {}", search_string.white().bold());
+                            let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
+                            let mut word_list: Vec<String> = Vec::new();
+                            let file_name = "./words_3.txt";
+                            let mut vec_index: usize = 0usize;
+                            file::load::full_list(
+                                &mut word_list,
+                                &mut anagrams,
+                                &file_name,
+                                &mut vec_index,
+                            );
+                            let results = lookup(
+                                &search_string.to_ascii_lowercase(),
+                                &word_list,
+                                &"".to_string(),
+                            );
+                            for s in results {
+                                println!("* {}", s.yellow());
+                            }
                             break;
                         }
                         'D' => {
