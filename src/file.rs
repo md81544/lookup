@@ -40,7 +40,7 @@ pub mod load {
         let file_name = "./thesaurus.txt".to_string();
         if let Ok(lines) = read_lines(&file_name) {
             for line in lines.map_while(Result::ok) {
-                let search_string = &(word.to_string() + ",");
+                let search_string = &(word.to_string() + ",").to_ascii_lowercase();
                 if line.starts_with(search_string) {
                     let words = line.split(",");
                     let mut first: bool = true;

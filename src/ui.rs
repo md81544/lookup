@@ -1,6 +1,7 @@
 pub mod display {
 
     use crate::define;
+    use crate::file::load::thesaurus;
     use crate::jumble;
     use crate::Action;
     use crate::OutputType;
@@ -381,7 +382,18 @@ pub mod display {
                             }
                         }
                         'T' => {
-                            println!("Thesaurus: {}", "TODO".white().bold());
+                            println!("Thesaurus: {}", search_string.white().bold());
+                            let mut results : Vec<String> = Vec::new();
+                            thesaurus(&mut results, &search_string);
+                            let mut first = true;
+                            for s in results {
+                                if ! first {
+                                    print!(", ");
+                                }
+                                print!("{}", s);
+                                first = false;
+                            }
+                            println!();
                             break;
                         }
                         'A' => {
