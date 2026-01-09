@@ -3,6 +3,7 @@ pub mod display {
     use crate::define;
     use crate::file::load::thesaurus;
     use crate::jumble;
+    use crate::reverse;
     use crate::Action;
     use crate::OutputType;
     use std::collections::HashSet;
@@ -383,11 +384,11 @@ pub mod display {
                         }
                         'T' => {
                             println!("Thesaurus: {}", search_string.white().bold());
-                            let mut results : Vec<String> = Vec::new();
+                            let mut results: Vec<String> = Vec::new();
                             thesaurus(&mut results, &search_string);
                             let mut first = true;
                             for s in results {
-                                if ! first {
+                                if !first {
                                     print!(", ");
                                 }
                                 print!("{}", s);
@@ -410,7 +411,10 @@ pub mod display {
                             break;
                         }
                         'V' => {
-                            println!("Reverse: {}", "TODO".white().bold());
+                            let results = reverse(&search_string);
+                            for s in results {
+                                println!("{} reversed = {}", search_string, s.yellow().bold());
+                            }
                             break;
                         }
                         'G' => {
