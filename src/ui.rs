@@ -3,6 +3,7 @@ pub mod display {
     use crate::define;
     use crate::file::load::thesaurus;
     use crate::jumble;
+    use crate::regular_patterns;
     use crate::reverse;
     use crate::Action;
     use crate::OutputType;
@@ -418,7 +419,19 @@ pub mod display {
                             break;
                         }
                         'G' => {
-                            println!("Regular: {}", "TODO".white().bold());
+                            println!("Regular: {}", search_string.white().bold());
+                            let results1 = regular_patterns(&search_string, false);
+                            let results2 = regular_patterns(&search_string, true);
+                            print!("Normal:   ");
+                            for s in results1 {
+                                print!("{}  ", s);
+                            }
+                            println!();
+                            print!("Reversed: ");
+                            for s in results2 {
+                                print!("{}  ", s);
+                            }
+                            println!();
                             break;
                         }
                         _ => {
