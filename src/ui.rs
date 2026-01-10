@@ -316,16 +316,23 @@ pub mod display {
                 if comment.len() > 0 {
                     println!("Comment: {}", comment);
                 }
-                let mut more_printed = false;
                 println!(
-                    "\nMenu: {}umble {}ound {}emove {}omment re{}tart {}ore {}uit",
+                    "\nMenu: {}umble {}ound {}emove {}omment re{}erse re{}ular",
                     "J".yellow(),
                     "F".yellow(),
                     "R".yellow(),
                     "C".yellow(),
+                    "V".yellow(),
+                    "G".yellow()
+                );
+                println!(
+                    "      {}hesaurus {}nagram {}ookup {}efine re{}tart {}uit",
+                    "T".yellow(),
+                    "A".yellow(),
+                    "L".yellow(),
+                    "D".yellow(),
                     "S".yellow(),
-                    "M".yellow(),
-                    "Q".yellow()
+                    "Q".yellow(),
                 );
                 loop {
                     match get_key() {
@@ -372,20 +379,6 @@ pub mod display {
                         'S' => {
                             println!("\n________\n");
                             break 'restart;
-                        }
-                        'M' => {
-                            if !more_printed {
-                                println!(
-                                    "      {}hesaurus {}nagram {}ookup {}efine re{}erse re{}ular",
-                                    "T".yellow(),
-                                    "A".yellow(),
-                                    "L".yellow(),
-                                    "D".yellow(),
-                                    "V".yellow(),
-                                    "G".yellow(),
-                                );
-                                more_printed = true;
-                            }
                         }
                         'T' => {
                             println!("Thesaurus: {}", search_string.white().bold());
