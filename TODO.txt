@@ -1,5 +1,3 @@
-* TUI anagram needs to search phrases as well
-
 * Menu doesn't need more... just display two lines
 
 * Allow hyphen as word separator in -f

@@ -406,12 +406,17 @@ pub mod display {
                             println!("Anagram: {}", search_string.white().bold());
                             let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
                             let mut word_list: Vec<String> = Vec::new();
-                            let file_name = "./words_3.txt";
                             let mut vec_index: usize = 0usize;
                             file::load::full_list(
                                 &mut word_list,
                                 &mut anagrams,
-                                &file_name,
+                                "./words_3.txt",
+                                &mut vec_index,
+                            );
+                            file::load::full_list(
+                                &mut word_list,
+                                &mut anagrams,
+                                "./phrases.txt",
                                 &mut vec_index,
                             );
                             let results = anagram_search(
