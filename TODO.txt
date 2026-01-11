@@ -1,3 +1,5 @@
+* TUI: Allow a "M"ark to save details of clue to allow one to return to it
+
 * Allow hyphen as word separator in -f
 
 * 'lu -t sleep -f s' doesn't return 'siesta' but '-f s.e.t.' does - the find option should perhaps work so anything starting with 's' is matched?
