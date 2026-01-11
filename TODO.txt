@@ -1,4 +1,6 @@
-* TUI: Allow a "M"ark to save details of clue to allow one to return to it
+* TUI: Allow a "M"ark to save details of clue to allow one to return to it (replacing "C"omment)
+
+* Error immediately if "F"ound string contains a letter missing from search string
 
 * Allow hyphen as word separator in -f
 
