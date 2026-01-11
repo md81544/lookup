@@ -289,6 +289,8 @@ pub mod display {
 
     pub fn tui() -> Result<(), rustyline::error::ReadlineError> {
         use crate::expand_found_string;
+        use std::io::{self, Write};
+
         'outer: loop {
             let search_string = input_string("Enter search string: ", Some(""));
             if search_string.len() == 0 {
@@ -334,8 +336,14 @@ pub mod display {
                     "S".yellow(),
                     "Q".yellow(),
                 );
+                print!(">");
+                io::stdout().flush().expect("Failed to flush stdout");
                 loop {
-                    match get_key() {
+                    let k = get_key();
+                    print!("\x08"); // backspace
+                    println!(" ");
+                    io::stdout().flush().expect("Failed to flush stdout");
+                    match k {
                         'J' => {
                             let mut letters = ".".to_string();
                             if found_string.len() > 0 {
@@ -479,6 +487,7 @@ pub mod display {
                 }
             }
         }
+        println!();
         Ok(())
     }
 }
