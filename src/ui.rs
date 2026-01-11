@@ -291,16 +291,33 @@ pub mod display {
         use crate::expand_found_string;
         use std::io::{self, Write};
 
+        //struct Datum {
+        //    search_string: String,
+        //    found_string: String,
+        //    comment: String,
+        //    note: String,
+        //}
+        //let data : HashMap<String, Datum> = HashMap::new();
+        println!();
         'outer: loop {
-            let search_string = input_string("Enter search string: ", Some(""));
+            let mut search_string = input_string("Enter search string: ", Some(""));
             if search_string.len() == 0 {
                 break;
             }
             let mut found_string = "".to_string();
             let mut comment = "".to_string();
+            if search_string.contains('.')
+                || search_string.contains('_')
+                || search_string.contains('*')
+            {
+                found_string = search_string.clone();
+                search_string.clear();
+            }
             'restart: loop {
                 println!();
-                println!("Search string: {} ({})", search_string, search_string.len());
+                if search_string.len() > 0 {
+                    println!("Search string: {} ({})", search_string, search_string.len());
+                }
                 if found_string.len() == 0 {
                     found_string = expand_found_string(&search_string, ".");
                 }
@@ -319,20 +336,23 @@ pub mod display {
                     println!("Comment: {}", comment);
                 }
                 println!(
-                    "\nMenu: {}umble {}ound {}emove {}omment re{}erse re{}ular",
+                    "\nMenu: {}umble {}ound {}emove {}omment re{}erse re{}ular {}hesaurus",
                     "J".yellow(),
                     "F".yellow(),
                     "R".yellow(),
                     "C".yellow(),
                     "V".yellow(),
-                    "G".yellow()
+                    "G".yellow(),
+                    "T".yellow()
                 );
                 println!(
-                    "      {}hesaurus {}nagram {}ookup {}efine re{}tart {}uit",
-                    "T".yellow(),
+                    "      {}nagram {}ookup {}efine {}ote st{}re r{}trieve re{}tart {}uit",
                     "A".yellow(),
                     "L".yellow(),
                     "D".yellow(),
+                    "N".yellow(),
+                    "O".yellow(),
+                    "E".yellow(),
                     "S".yellow(),
                     "Q".yellow(),
                 );
@@ -443,7 +463,7 @@ pub mod display {
                                 &mut vec_index,
                             );
                             let results = lookup(
-                                &search_string.to_ascii_lowercase(),
+                                &found_string.to_ascii_lowercase(),
                                 &word_list,
                                 &"".to_string(),
                             );
@@ -478,6 +498,18 @@ pub mod display {
                                 print!("{}  ", s);
                             }
                             println!();
+                            break;
+                        }
+                        'O' => {
+                            println!("Store: {}", "TODO".white().bold());
+                            break;
+                        }
+                        'E' => {
+                            println!("Retrieve: {}", "TODO".white().bold());
+                            break;
+                        }
+                        'N' => {
+                            println!("Note: {}", "TODO".white().bold());
                             break;
                         }
                         _ => {

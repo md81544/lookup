@@ -1,4 +1,4 @@
-* TUI: Allow a "M"ark to save details of clue to allow one to return to it (replacing "C"omment?)
+* TUI: Allow save of details of clue to allow one to return to it
 
 * Error immediately if "F"ound string contains a letter missing from search string
 
