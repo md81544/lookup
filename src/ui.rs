@@ -7,6 +7,7 @@ pub mod display {
     use crate::jumble;
     use crate::lookup;
     use crate::regular_patterns;
+    use crate::remove_found_mismatches;
     use crate::reverse;
     use crate::Action;
     use crate::OutputType;
@@ -461,11 +462,28 @@ pub mod display {
                                 &file_name,
                                 &mut vec_index,
                             );
-                            let results = lookup(
-                                &found_string.to_ascii_lowercase(),
-                                &word_list,
-                                &"".to_string(),
-                            );
+                            let mut results;
+                            if search_string.len() > 0
+                                && !search_string.contains('.')
+                                && !search_string.contains('_')
+                                && !search_string.contains('%')
+                            {
+                                // If we have a non-wildcarded search string, we can do the
+                                // lookup by an anagram search followed by remove_found_mismatches()
+                                results = anagram_search(
+                                    &search_string.to_ascii_lowercase(),
+                                    &word_list,
+                                    &anagrams,
+                                );
+                                results =
+                                    remove_found_mismatches(&results, found_string.clone(), false);
+                            } else {
+                                results = lookup(
+                                    &found_string.to_ascii_lowercase(),
+                                    &word_list,
+                                    &"".to_string(),
+                                );
+                            }
                             for s in results {
                                 println!("* {}", s.yellow());
                             }
