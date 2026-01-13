@@ -291,13 +291,12 @@ pub mod display {
         use crate::expand_found_string;
         use std::io::{self, Write};
 
-        //struct Datum {
-        //    search_string: String,
-        //    found_string: String,
-        //    comment: String,
-        //    note: String,
-        //}
-        //let data : HashMap<String, Datum> = HashMap::new();
+        struct Datum {
+            search_string: String,
+            found_string: String,
+            comment: String,
+        }
+        let mut data: HashMap<String, Datum> = HashMap::new();
         println!();
         'outer: loop {
             let mut search_string = input_string("Enter search string: ", Some(""));
@@ -500,16 +499,37 @@ pub mod display {
                             println!();
                             break;
                         }
+                        'N' => {
+                            println!("Note: {}", "TODO".white().bold());
+                            break;
+                        }
                         'O' => {
-                            println!("Store: {}", "TODO".white().bold());
+                            // stOre
+                            let d = Datum {
+                                comment: comment.clone(),
+                                found_string: found_string.clone(),
+                                search_string: search_string.clone(),
+                            };
+                            let key =
+                                input_string("Store: Enter clue number (e.g. 2D or 14A) ", None);
+                            if key.len() > 0 {
+                                data.insert(key, d);
+                            }
                             break;
                         }
                         'E' => {
-                            println!("Retrieve: {}", "TODO".white().bold());
-                            break;
-                        }
-                        'N' => {
-                            println!("Note: {}", "TODO".white().bold());
+                            let key =
+                                input_string("Retrieve: Enter clue number (e.g. 2D or 14A) ", None);
+                            if key.len() == 0 {
+                                break;
+                            }
+                            if let Some(d) = data.get(&key) {
+                                comment = d.comment.clone();
+                                found_string = d.found_string.clone();
+                                search_string = d.search_string.clone();
+                            } else {
+                                println!("{}", "Clue not found".red());
+                            }
                             break;
                         }
                         _ => {

@@ -1,10 +1,12 @@
-* TUI: Allow save of details of clue to allow one to return to it
+* TUI: Lookup should remove any results that don't contain all letters
+  (use remove_found_mismatches()? But need to limit to search_string's characters)
 
 * Error immediately if "F"ound string contains a letter missing from search string
 
 * Allow hyphen as word separator in -f
 
-* 'lu -t sleep -f s' doesn't return 'siesta' but '-f s.e.t.' does - the find option should perhaps work so anything starting with 's' is matched?
+* 'lu -t sleep -f s' doesn't return 'siesta' but '-f s.e.t.' does - the find option should perhaps
+    work so anything starting with 's' is matched?
     - -z size flag doesn't help
 
 * Further to the previous point, -t should work with -z, so for
@@ -13,13 +15,15 @@
 
 * Add word length in display of -v (reverse)
 
-* Maybe make use of definitions for thesaurus lookup? E.g. any definition which contains, say, 'horse' in the definition
+* Maybe make use of definitions for thesaurus lookup? E.g. any definition which contains, say,
+  'horse' in the definition
 
 * % should work after word separator ('/')
     - and also inline, so e.g. s%es could match 'stresses'
       (would need size parameter)
 
-* Add -n/--notepad option for just entering the found letters and the option to edit it to avoid needing an editor sometimes
+* Add -n/--notepad option for just entering the found letters and the option to edit it to avoid
+  needing an editor sometimes
 
 * Change debug mode to use full dictionary but be verbose (i.e. show workings)
 
@@ -37,7 +41,8 @@
 * Allow -f with -r to find words in "in" clues... for example
   -v aldershotcafedemolition -f __/__c__ should return "de facto"
 
-* List words found as substrings of -g or -r (and maybe a new option to find substring words in a long string? E.g. "birthaim" could return "thai"
+* List words found as substrings of -g or -r (and maybe a new option to find substring words in a
+  long string? E.g. "birthaim" could return "thai"
 
 * all word lists are expected to be in ASCII but we use String (i.e. UTF-8) throughout
   so it would _probably_ be an optimisation to use bytes instead
