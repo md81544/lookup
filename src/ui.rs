@@ -15,6 +15,7 @@ pub mod display {
     use std::collections::HashSet;
 
     use colored::Colorize;
+    use rustyline::config::Configurer;
 
     fn print_separator(output_type: OutputType) {
         if output_type == OutputType::Narrow {
@@ -262,6 +263,7 @@ pub mod display {
             .get_or_init(|| Mutex::new(rustyline::DefaultEditor::new().unwrap()))
             .lock()
             .unwrap();
+        rl.set_edit_mode(rustyline::EditMode::Vi);
         let mut rc = "".to_string();
         let readline;
         if default.is_none() {
