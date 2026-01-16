@@ -464,6 +464,12 @@ pub mod display {
                                 &file_name,
                                 &mut vec_index,
                             );
+                            file::load::full_list(
+                                &mut word_list,
+                                &mut anagrams,
+                                "./phrases.txt",
+                                &mut vec_index,
+                            );
                             let mut results;
                             if search_string.len() > 0
                                 && !search_string.contains('.')
