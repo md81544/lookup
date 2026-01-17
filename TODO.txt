@@ -1,5 +1,4 @@
-* TUI: Lookup should remove any results that don't contain all letters
-  (use remove_found_mismatches()? But need to limit to search_string's characters)
+* TUI: If a clue has been saved, update the save if comment or found string changes? (Maybe)
 
 * Error immediately if "F"ound string contains a letter missing from search string
 
