@@ -269,7 +269,7 @@ pub mod display {
         if default.is_none() {
             readline = rl.readline(prompt);
         } else {
-            readline = rl.readline_with_initial(prompt, (default.unwrap(), ""));
+            readline = rl.readline_with_initial(prompt, ("", default.unwrap()));
         }
         match readline {
             Ok(line) => {
@@ -335,7 +335,7 @@ pub mod display {
                     println!();
                 }
                 if comment.len() > 0 {
-                    println!("Comment: {}", comment);
+                    println!("Comment:       {}", comment);
                 }
                 println!(
                     "\nMenu: {}umble {}ound {}emove {}omment re{}erse re{}ular {}hesaurus",
