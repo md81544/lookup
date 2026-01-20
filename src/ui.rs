@@ -352,15 +352,16 @@ pub mod display {
                     "S".yellow(),
                     "Q".yellow(),
                 );
-                print!(">");
                 io::stdout().flush().expect("Failed to flush stdout");
                 loop {
+                    print!(">");
+                    io::stdout().flush().expect("Failed to flush stdout");
                     let k = get_key();
-                    print!("\x08"); // backspace
-                    println!(" ");
+                    print!("\x08 \x08"); // backspace
                     io::stdout().flush().expect("Failed to flush stdout");
                     match k {
                         'J' => {
+                            println!();
                             let mut letters = ".".to_string();
                             if !found_string.is_empty() {
                                 letters = found_string.clone();
@@ -376,6 +377,7 @@ pub mod display {
                             break;
                         }
                         'F' => {
+                            println!();
                             found_string =
                                 input_string("Enter found letters: ", Some(&found_string));
                             found_string = expand_found_string(&search_string, &found_string);
@@ -390,22 +392,25 @@ pub mod display {
                             break;
                         }
                         'R' => {
+                            println!();
                             interactive_remove(search_string.clone());
                             break;
                         }
                         'C' => {
+                            println!();
                             comment = input_string("Enter comment: ", Some(""));
                             break;
                         }
                         'Q' => {
+                            println!();
                             break 'outer;
                         }
                         'S' => {
-                            println!("\n________\n");
+                            println!("\n\n________\n");
                             break 'restart;
                         }
                         'T' => {
-                            println!("Thesaurus: {}", search_string.white().bold());
+                            println!("\nThesaurus: {}", search_string.white().bold());
                             let mut results: Vec<String> = Vec::new();
                             thesaurus(&mut results, &search_string);
                             let mut first = true;
@@ -420,7 +425,7 @@ pub mod display {
                             break;
                         }
                         'A' => {
-                            println!("Anagram: {}", search_string.white().bold());
+                            println!("\nAnagram: {}", search_string.white().bold());
                             let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
                             let mut word_list: Vec<String> = Vec::new();
                             let mut vec_index: usize = 0usize;
@@ -447,7 +452,7 @@ pub mod display {
                             break;
                         }
                         'L' => {
-                            println!("Lookup: {}", search_string.white().bold());
+                            println!("\nLookup: {}", search_string.white().bold());
                             let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
                             let mut word_list: Vec<String> = Vec::new();
                             let file_name = "./words_3.txt";
@@ -492,11 +497,12 @@ pub mod display {
                             break;
                         }
                         'D' => {
-                            println!("Define: {}", search_string.white().bold());
+                            println!("\nDefine: {}", search_string.white().bold());
                             define(&search_string, OutputType::Normal);
                             break;
                         }
                         'V' => {
+                            println!();
                             let results = reverse(&search_string);
                             for s in results {
                                 println!("{} reversed = {}", search_string, s.yellow().bold());
@@ -504,7 +510,7 @@ pub mod display {
                             break;
                         }
                         'G' => {
-                            println!("Regular: {}", search_string.white().bold());
+                            println!("\nRegular: {}", search_string.white().bold());
                             let results1 = regular_patterns(&search_string, false);
                             let results2 = regular_patterns(&search_string, true);
                             print!("Normal:   ");
@@ -520,10 +526,11 @@ pub mod display {
                             break;
                         }
                         'N' => {
-                            println!("Note: {}", "TODO".white().bold());
+                            println!("\nNote: {}", "TODO".white().bold());
                             break;
                         }
                         'O' => {
+                            println!();
                             // stOre
                             let d = Datum {
                                 comment: comment.clone(),
@@ -538,6 +545,7 @@ pub mod display {
                             break;
                         }
                         'E' => {
+                            println!();
                             let key =
                                 input_string("Retrieve: Enter clue number (e.g. 2D or 14A) ", None);
                             if key.is_empty() {
