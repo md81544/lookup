@@ -39,20 +39,14 @@ pub mod display {
             if let Some(pos) = ls.find(c) {
                 ls.remove(pos);
                 found_chars.insert(c);
-            } else {
-                if !found_chars.contains(&c) {
-                    return false;
-                }
+            } else if !found_chars.contains(&c) {
+                return false;
             }
         }
         // Finally, did we use all the letters in the letter_set?
         // For instance "ASSET" shouldn't match letter_set "TASTE"
         // because both Ts were not used
-        if ls.is_empty() {
-            true
-        } else {
-            false
-        }
+        ls.is_empty()
     }
 
     pub fn show_results(
@@ -275,17 +269,17 @@ pub mod display {
             Ok(line) => {
                 rl.add_history_entry(line.as_str()).unwrap();
                 rc = line.to_uppercase();
-                return rc;
+                rc
             }
             Err(ReadlineError::Interrupted) => {
-                return rc;
+                rc
             }
             Err(ReadlineError::Eof) => {
-                return rc;
+                rc
             }
             Err(err) => {
                 println!("Error: {:?}", err);
-                return rc;
+                rc
             }
         }
     }
@@ -303,7 +297,7 @@ pub mod display {
         println!();
         'outer: loop {
             let mut search_string = input_string("Enter search string: ", Some(""));
-            if search_string.len() == 0 {
+            if search_string.is_empty() {
                 break;
             }
             let mut found_string = "".to_string();
@@ -317,13 +311,13 @@ pub mod display {
             }
             'restart: loop {
                 println!();
-                if search_string.len() > 0 {
+                if !search_string.is_empty() {
                     println!("Search string: {} ({})", search_string, search_string.len());
                 }
-                if found_string.len() == 0 {
+                if found_string.is_empty() {
                     found_string = expand_found_string(&search_string, ".");
                 }
-                if found_string.len() > 0 {
+                if !found_string.is_empty() {
                     print!("Found letters: ");
                     for c in found_string.chars() {
                         if c == '.' {
@@ -334,7 +328,7 @@ pub mod display {
                     }
                     println!();
                 }
-                if comment.len() > 0 {
+                if !comment.is_empty() {
                     println!("Comment:       {}", comment);
                 }
                 println!(
@@ -368,7 +362,7 @@ pub mod display {
                     match k {
                         'J' => {
                             let mut letters = ".".to_string();
-                            if found_string.len() > 0 {
+                            if !found_string.is_empty() {
                                 letters = found_string.clone();
                             } else {
                                 letters = expand_found_string(&search_string, &letters);
@@ -461,7 +455,7 @@ pub mod display {
                             file::load::full_list(
                                 &mut word_list,
                                 &mut anagrams,
-                                &file_name,
+                                file_name,
                                 &mut vec_index,
                             );
                             file::load::full_list(
@@ -471,7 +465,7 @@ pub mod display {
                                 &mut vec_index,
                             );
                             let mut results;
-                            if search_string.len() > 0
+                            if !search_string.is_empty()
                                 && !search_string.contains('.')
                                 && !search_string.contains('_')
                                 && !search_string.contains('%')
@@ -489,7 +483,7 @@ pub mod display {
                                 results = lookup(
                                     &found_string.to_ascii_lowercase(),
                                     &word_list,
-                                    &"".to_string(),
+                                    "",
                                 );
                             }
                             for s in results {
@@ -538,7 +532,7 @@ pub mod display {
                             };
                             let key =
                                 input_string("Store: Enter clue number (e.g. 2D or 14A) ", None);
-                            if key.len() > 0 {
+                            if !key.is_empty() {
                                 data.insert(key, d);
                             }
                             break;
@@ -546,7 +540,7 @@ pub mod display {
                         'E' => {
                             let key =
                                 input_string("Retrieve: Enter clue number (e.g. 2D or 14A) ", None);
-                            if key.len() == 0 {
+                            if key.is_empty() {
                                 break;
                             }
                             if let Some(d) = data.get(&key) {

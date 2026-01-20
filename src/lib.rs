@@ -375,7 +375,7 @@ pub fn remove_found_mismatches(
         }
     }
     if !regex_string.contains(".*") {
-        regex_string.push_str("$");
+        regex_string.push('$');
     }
     let re = Regex::new(&regex_string).unwrap();
     for word in results {
@@ -411,13 +411,11 @@ pub fn define(word: &str, output_type: OutputType) {
         }
         let json_output = serde_json::to_string(&v).unwrap();
         println!("{}", json_output);
+    } else if results.is_empty() {
+        println!("No definition found.");
     } else {
-        if results.is_empty() {
-            println!("No definition found.");
-        } else {
-            for result in results {
-                println!(" * {}", result);
-            }
+        for result in results {
+            println!(" * {}", result);
         }
     }
 }
@@ -425,11 +423,11 @@ pub fn define(word: &str, output_type: OutputType) {
 pub fn expand_found_string(search_string: &str, found_letters: &str) -> String {
     // Ensures that the "found" string matches the length of the search string
     let mut found = found_letters.to_string();
-    if found.len() == 0 {
+    if found.is_empty() {
         return found;
     }
     found = expand_numbers(&found);
-    if found.chars().next() == Some('%') {
+    if found.starts_with('%') {
         found.remove(0);
         let f = found.replace('/', "");
         for _ in 0..search_string.len() - f.len() {

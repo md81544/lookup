@@ -124,9 +124,9 @@ fn test_wordle_exclude_green() {
 
 #[test]
 fn test_yellow_check() {
-    assert_eq!(true, check_yellow_letters_exist("dryer", "__y__", "er"));
-    assert_eq!(false, check_yellow_letters_exist("dryer", "__y__", "ery")); // no second y
-    assert_eq!(true, check_yellow_letters_exist("dryer", "d___r", "")); // no yellow letters
+    assert!(check_yellow_letters_exist("dryer", "__y__", "er"));
+    assert!(!check_yellow_letters_exist("dryer", "__y__", "ery")); // no second y
+    assert!(check_yellow_letters_exist("dryer", "d___r", "")); // no yellow letters
 }
 
 #[test]
@@ -296,10 +296,10 @@ fn test_anagram_with_multiword_incomplete_found2() {
 fn test_word_contains_all_letters() {
     // Note, first parameter is the word we're checking, and the second
     // is the set of letters we're checking against
-    assert!(ui::display::word_contains_all_letters("ASSET", "SEAT") == true);
-    assert!(ui::display::word_contains_all_letters("ASSET", "TASTE") == false); // T not used twice
-    assert!(ui::display::word_contains_all_letters("ASSET", "SETAS") == true);
-    assert!(ui::display::word_contains_all_letters("GATEFOLLE", "LEGATE") == false);
-    assert!(ui::display::word_contains_all_letters("TELLER", "RELET") == true);
-    assert!(ui::display::word_contains_all_letters("OUTWITTING", "OUTWING") == true);
+    assert!(ui::display::word_contains_all_letters("ASSET", "SEAT"));
+    assert!(!ui::display::word_contains_all_letters("ASSET", "TASTE")); // T not used twice
+    assert!(ui::display::word_contains_all_letters("ASSET", "SETAS"));
+    assert!(!ui::display::word_contains_all_letters("GATEFOLLE", "LEGATE"));
+    assert!(ui::display::word_contains_all_letters("TELLER", "RELET"));
+    assert!(ui::display::word_contains_all_letters("OUTWITTING", "OUTWING"));
 }

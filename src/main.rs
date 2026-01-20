@@ -2,7 +2,6 @@ use clap::{ArgGroup, Parser};
 use colored::Colorize;
 use std::collections::HashMap;
 use std::process::exit;
-use OutputType;
 
 use lookup::*;
 
