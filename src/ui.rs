@@ -352,13 +352,13 @@ pub mod display {
                     "S".yellow(),
                     "Q".yellow(),
                 );
-                io::stdout().flush().expect("Failed to flush stdout");
+                io::stdout().flush()?;
                 loop {
                     print!(">");
-                    io::stdout().flush().expect("Failed to flush stdout");
+                    io::stdout().flush()?;
                     let k = get_key();
                     print!("\x08 \x08"); // backspace
-                    io::stdout().flush().expect("Failed to flush stdout");
+                    io::stdout().flush()?;
                     match k {
                         'J' => {
                             println!();
