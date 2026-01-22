@@ -271,12 +271,8 @@ pub mod display {
                 rc = line.to_uppercase();
                 rc
             }
-            Err(ReadlineError::Interrupted) => {
-                rc
-            }
-            Err(ReadlineError::Eof) => {
-                rc
-            }
+            Err(ReadlineError::Interrupted) => rc,
+            Err(ReadlineError::Eof) => rc,
             Err(err) => {
                 println!("Error: {:?}", err);
                 rc
@@ -296,7 +292,16 @@ pub mod display {
         let mut data: HashMap<String, Datum> = HashMap::new();
         println!();
         'outer: loop {
-            let mut search_string = input_string("Enter search string: ", Some(""));
+            let mut clue: String = "".to_string();
+            while clue.is_empty() {
+                clue = input_string("Enter clue number (e.g. 4A or 7D): ", None);
+                if clue.is_empty() {
+                    println!("Clue number is required");
+                } else {
+                    break;
+                }
+            }
+            let mut search_string = input_string("Enter search string: ", None);
             if search_string.is_empty() {
                 break;
             }
@@ -311,6 +316,7 @@ pub mod display {
             }
             'restart: loop {
                 println!();
+                println!("Clue no:       {}", &clue);
                 if !search_string.is_empty() {
                     println!("Search string: {} ({})", search_string, search_string.len());
                 }
@@ -485,11 +491,8 @@ pub mod display {
                                 results =
                                     remove_found_mismatches(&results, found_string.clone(), false);
                             } else {
-                                results = lookup(
-                                    &found_string.to_ascii_lowercase(),
-                                    &word_list,
-                                    "",
-                                );
+                                results =
+                                    lookup(&found_string.to_ascii_lowercase(), &word_list, "");
                             }
                             for s in results {
                                 println!("* {}", s.yellow());
@@ -537,17 +540,25 @@ pub mod display {
                                 found_string: found_string.clone(),
                                 search_string: search_string.clone(),
                             };
-                            let key =
-                                input_string("Store: Enter clue number (e.g. 2D or 14A) ", None);
-                            if !key.is_empty() {
-                                data.insert(key, d);
-                            }
+                            data.insert(clue.clone(), d);
                             break;
                         }
                         'E' => {
                             println!();
+                            let mut sorted_pairs: Vec<(&String, &Datum)> = data.iter().collect();
+                            sorted_pairs.sort_by(|a, b| a.0.cmp(b.0));
+                            let mut first: bool = true;
+                            print!("Stored clues: ");
+                            for (key, _) in sorted_pairs {
+                                if !first {
+                                    print!(", ");
+                                }
+                                print!("{}", key);
+                                first = false;
+                            }
+                            println!();
                             let key =
-                                input_string("Retrieve: Enter clue number (e.g. 2D or 14A) ", None);
+                                input_string("Retrieve: Enter clue number: ", None);
                             if key.is_empty() {
                                 break;
                             }
