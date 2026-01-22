@@ -288,6 +288,7 @@ pub mod display {
             search_string: String,
             found_string: String,
             comment: String,
+            clue: String,
         }
         let mut data: HashMap<String, Datum> = HashMap::new();
         println!();
@@ -539,6 +540,7 @@ pub mod display {
                                 comment: comment.clone(),
                                 found_string: found_string.clone(),
                                 search_string: search_string.clone(),
+                                clue: clue.clone(),
                             };
                             data.insert(clue.clone(), d);
                             break;
@@ -566,6 +568,7 @@ pub mod display {
                                 comment = d.comment.clone();
                                 found_string = d.found_string.clone();
                                 search_string = d.search_string.clone();
+                                clue = d.clue.clone();
                             } else {
                                 println!("{}", "Clue not found".red());
                             }
