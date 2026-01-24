@@ -1,4 +1,5 @@
-* TUI: If a clue has been saved, update the save if comment or found string changes? (Maybe)
+* TUI: add option to restart without loading existing (OR implement option to re-enter
+  search string)
 
 * Error immediately if "F"ound string contains a letter missing from search string
 

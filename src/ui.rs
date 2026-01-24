@@ -17,6 +17,13 @@ pub mod display {
     use colored::Colorize;
     use rustyline::config::Configurer;
 
+    struct Datum {
+        search_string: String,
+        found_string: String,
+        comment: String,
+        clue: String,
+    }
+
     fn print_separator(output_type: OutputType) {
         if output_type == OutputType::Narrow {
             println!();
@@ -284,30 +291,25 @@ pub mod display {
         use crate::expand_found_string;
         use std::io::{self, Write};
 
-        struct Datum {
-            search_string: String,
-            found_string: String,
-            comment: String,
-            clue: String,
-        }
         let mut data: HashMap<String, Datum> = HashMap::new();
         println!();
         'outer: loop {
-            let mut clue: String = "".to_string();
-            while clue.is_empty() {
-                clue = input_string("Enter clue number (e.g. 4A or 7D): ", None);
-                if clue.is_empty() {
-                    println!("Clue number is required");
-                } else {
-                    break;
-                }
+            let mut clue = input_string("Enter clue number (e.g. 4A or 7D): ", None);
+            let mut search_string = "".to_string();
+            let mut found_string = "".to_string();
+            let mut comment = "".to_string();
+            if let Some(d) = data.get(&clue) {
+                comment = d.comment.clone();
+                found_string = d.found_string.clone();
+                search_string = d.search_string.clone();
+                clue = d.clue.clone();
             }
-            let mut search_string = input_string("Enter search string: ", None);
+            if search_string.is_empty() {
+                search_string = input_string("Enter search string: ", None);
+            }
             if search_string.is_empty() {
                 break;
             }
-            let mut found_string = "".to_string();
-            let mut comment = "".to_string();
             if search_string.contains('.')
                 || search_string.contains('_')
                 || search_string.contains('*')
@@ -317,7 +319,9 @@ pub mod display {
             }
             'restart: loop {
                 println!();
-                println!("Clue no:       {}", &clue);
+                if !clue.is_empty() {
+                    println!("Clue no:       {}", &clue);
+                }
                 if !search_string.is_empty() {
                     println!("Search string: {} ({})", search_string, search_string.len());
                 }
@@ -414,6 +418,9 @@ pub mod display {
                         }
                         'S' => {
                             println!("\n\n________\n");
+                            // Before auto-saving we need a way to edit search_string
+                            // or a confirmation
+                            //save(&mut data, &clue, &search_string, &found_string, &comment);
                             break 'restart;
                         }
                         'T' => {
@@ -535,14 +542,13 @@ pub mod display {
                         }
                         'O' => {
                             println!();
-                            // stOre
-                            let d = Datum {
-                                comment: comment.clone(),
-                                found_string: found_string.clone(),
-                                search_string: search_string.clone(),
-                                clue: clue.clone(),
-                            };
-                            data.insert(clue.clone(), d);
+                            if clue.is_empty() {
+                                clue = input_string("Enter clue number (e.g. 4A or 7D): ", None);
+                            }
+                            if !clue.is_empty() {
+                                // stOre
+                                save(&mut data, &clue, &search_string, &found_string, &comment);
+                            }
                             break;
                         }
                         'E' => {
@@ -559,8 +565,7 @@ pub mod display {
                                 first = false;
                             }
                             println!();
-                            let key =
-                                input_string("Retrieve: Enter clue number: ", None);
+                            let key = input_string("Retrieve: Enter clue number: ", None);
                             if key.is_empty() {
                                 break;
                             }
@@ -583,5 +588,21 @@ pub mod display {
         }
         println!();
         Ok(())
+    }
+
+    fn save(
+        data: &mut HashMap<String, Datum>,
+        clue: &String,
+        search_string: &String,
+        found_string: &String,
+        comment: &String,
+    ) {
+        let d = Datum {
+            comment: comment.clone(),
+            found_string: found_string.clone(),
+            search_string: search_string.clone(),
+            clue: clue.clone(),
+        };
+        data.insert(clue.clone(), d);
     }
 }
