@@ -294,16 +294,10 @@ pub mod display {
         let mut data: HashMap<String, Datum> = HashMap::new();
         println!();
         'outer: loop {
-            let mut clue = input_string("Enter clue number (e.g. 4A or 7D): ", None);
+            let mut clue = "".to_string();
             let mut search_string = "".to_string();
             let mut found_string = "".to_string();
             let mut comment = "".to_string();
-            if let Some(d) = data.get(&clue) {
-                comment = d.comment.clone();
-                found_string = d.found_string.clone();
-                search_string = d.search_string.clone();
-                clue = d.clue.clone();
-            }
             if search_string.is_empty() {
                 search_string = input_string("Enter search string: ", None);
             }
@@ -426,7 +420,7 @@ pub mod display {
                         'T' => {
                             println!("\nThesaurus: {}", search_string.white().bold());
                             let mut results: Vec<String> = Vec::new();
-                            thesaurus(&mut results, &search_string);
+                            thesaurus(&mut results, &search_string.to_ascii_lowercase());
                             let mut first = true;
                             for s in results {
                                 if !first {
