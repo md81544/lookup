@@ -309,7 +309,6 @@ pub mod display {
                 || search_string.contains('*')
             {
                 found_string = search_string.clone();
-                search_string.clear();
             }
             'restart: loop {
                 println!();
