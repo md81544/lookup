@@ -1,5 +1,5 @@
-* TUI: add option to restart without loading existing (OR implement option to re-enter
-  search string)
+* Create own "input string" function to replace rustyline which does realtime letter
+  counting, and defaults to overwrite
 
 * Error immediately if "F"ound string contains a letter missing from search string
 
