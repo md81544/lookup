@@ -229,17 +229,14 @@ pub mod display {
     }
 
     fn get_key() -> char {
-        use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+        // Note! This only returns upper case characters
+        use crossterm::event::{self, Event, KeyEvent, KeyEventKind};
         use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
         let rc: char;
         let _ = enable_raw_mode();
         loop {
             if let Event::Key(KeyEvent { code, kind, .. }) = event::read().unwrap() {
                 if kind == KeyEventKind::Press {
-                    if code == KeyCode::Esc {
-                        rc = 'q';
-                        break;
-                    }
                     let c = code.as_char();
                     if c.is_some() {
                         let c = code.as_char().unwrap().to_ascii_uppercase();
@@ -252,6 +249,12 @@ pub mod display {
         let _ = disable_raw_mode();
         rc
     }
+
+    // fn input_string2(prompt: &str, default: Option<&str>) -> String {
+    //     let mut rc = "".to_string();
+    //     rc
+    // }
+
 
     fn input_string(prompt: &str, default: Option<&str>) -> String {
         use rustyline::error::ReadlineError;
