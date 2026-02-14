@@ -15,6 +15,7 @@ pub mod display {
     use std::collections::HashSet;
 
     use colored::Colorize;
+    use crossterm::event::KeyCode;
     use rustyline::config::Configurer;
 
     struct Datum {
@@ -236,12 +237,23 @@ pub mod display {
         let _ = enable_raw_mode();
         loop {
             if let Event::Key(KeyEvent { code, kind, .. }) = event::read().unwrap() {
-                if kind == KeyEventKind::Press {
-                    let c = code.as_char();
-                    if c.is_some() {
-                        let c = code.as_char().unwrap().to_ascii_uppercase();
-                        rc = c;
-                        break;
+                if code == KeyCode::Left {
+                    rc = b'0' as char;
+                    break;
+                } else if code == KeyCode::Right {
+                    rc = b'1' as char;
+                    break;
+                } else if code == KeyCode::Enter {
+                    rc = b'3' as char;
+                    break;
+                } else {
+                    if kind == KeyEventKind::Press {
+                        let c = code.as_char();
+                        if c.is_some() {
+                            let c = code.as_char().unwrap().to_ascii_uppercase();
+                            rc = c;
+                            break;
+                        }
                     }
                 }
             }
@@ -249,12 +261,6 @@ pub mod display {
         let _ = disable_raw_mode();
         rc
     }
-
-    // fn input_string2(prompt: &str, default: Option<&str>) -> String {
-    //     let mut rc = "".to_string();
-    //     rc
-    // }
-
 
     fn input_string(prompt: &str, default: Option<&str>) -> String {
         use rustyline::error::ReadlineError;
