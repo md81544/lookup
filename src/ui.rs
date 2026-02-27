@@ -567,7 +567,14 @@ pub mod display {
                                 first = false;
                             }
                             println!();
-                            let key = input_string("Retrieve: Enter clue number: ", None);
+
+                            let key: String = if data.len() == 1 {
+                                println!("Only one stored clue, retrieving that.");
+                                data.keys().next().cloned().expect("Expected one key")
+                            } else {
+                                input_string("Retrieve: Enter clue number: ", None)
+                            };
+
                             if key.is_empty() {
                                 break;
                             }
