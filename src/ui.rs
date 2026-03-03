@@ -25,6 +25,23 @@ pub mod display {
         clue: String,
     }
 
+    #[derive(Debug, PartialEq)]
+    enum SpecialKey {
+        LeftArrow,
+        RightArrow,
+        Enter,
+        Escape,
+        Backspace,
+        Delete,
+        NoOp
+    }
+
+    #[derive(Debug, PartialEq)]
+    enum KeyPress {
+        Letter(char),
+        Special(SpecialKey),
+    }
+
     fn print_separator(output_type: OutputType) {
         if output_type == OutputType::Narrow {
             println!();
@@ -229,37 +246,33 @@ pub mod display {
         println!();
     }
 
-    fn get_key() -> char {
-        // Note! This only returns upper case characters
-        use crossterm::event::{self, Event, KeyEvent, KeyEventKind};
+    fn get_crossterm_key() -> KeyCode {
+        use crossterm::event::{self, Event, KeyEvent};
         use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
-        let rc: char;
         let _ = enable_raw_mode();
+        let keycode;
         loop {
-            if let Event::Key(KeyEvent { code, kind, .. }) = event::read().unwrap() {
-                if code == KeyCode::Left {
-                    rc = b'0' as char;
-                    break;
-                } else if code == KeyCode::Right {
-                    rc = b'1' as char;
-                    break;
-                } else if code == KeyCode::Enter {
-                    rc = b'3' as char;
-                    break;
-                } else {
-                    if kind == KeyEventKind::Press {
-                        let c = code.as_char();
-                        if c.is_some() {
-                            let c = code.as_char().unwrap().to_ascii_uppercase();
-                            rc = c;
-                            break;
-                        }
-                    }
-                }
+            if let Event::Key(KeyEvent { code, kind: _, .. }) = event::read().unwrap() {
+                keycode = code;
+                break;
             }
         }
         let _ = disable_raw_mode();
-        rc
+        keycode
+    }
+
+    fn get_key() -> KeyPress {
+        let code = get_crossterm_key();
+        match code {
+            KeyCode::Char(c) if c.is_ascii_alphabetic() => KeyPress::Letter(c.to_ascii_uppercase()),
+            KeyCode::Left => KeyPress::Special(SpecialKey::LeftArrow),
+            KeyCode::Right => KeyPress::Special(SpecialKey::RightArrow),
+            KeyCode::Esc => KeyPress::Special(SpecialKey::Escape),
+            KeyCode::Enter => KeyPress::Special(SpecialKey::Enter),
+            KeyCode::Backspace => KeyPress::Special(SpecialKey::Backspace),
+            KeyCode::Delete => KeyPress::Special(SpecialKey::Delete),
+            _ => KeyPress::Special(SpecialKey::NoOp),
+        }
     }
 
     fn input_string(prompt: &str, default: Option<&str>) -> String {
@@ -373,7 +386,7 @@ pub mod display {
                     print!("\x08 \x08"); // backspace
                     io::stdout().flush()?;
                     match k {
-                        'J' => {
+                        KeyPress::Letter('J') => {
                             println!();
                             let mut letters = ".".to_string();
                             if !found_string.is_empty() {
@@ -389,7 +402,7 @@ pub mod display {
                             );
                             break;
                         }
-                        'F' => {
+                        KeyPress::Letter('F') => {
                             println!();
                             found_string =
                                 input_string("Enter found letters: ", Some(&found_string));
@@ -404,28 +417,28 @@ pub mod display {
                             }
                             break;
                         }
-                        'R' => {
+                        KeyPress::Letter('R') => {
                             println!();
                             interactive_remove(search_string.clone());
                             break;
                         }
-                        'C' => {
+                        KeyPress::Letter('C') => {
                             println!();
                             comment = input_string("Enter comment: ", Some(""));
                             break;
                         }
-                        'Q' => {
+                        KeyPress::Letter('Q') => {
                             println!();
                             break 'outer;
                         }
-                        'S' => {
+                        KeyPress::Letter('S') => {
                             println!("\n\n________\n");
                             // Before auto-saving we need a way to edit search_string
                             // or a confirmation
                             //save(&mut data, &clue, &search_string, &found_string, &comment);
                             break 'restart;
                         }
-                        'T' => {
+                        KeyPress::Letter('T') => {
                             println!("\nThesaurus: {}", search_string.white().bold());
                             let mut results: Vec<String> = Vec::new();
                             thesaurus(&mut results, &search_string.to_ascii_lowercase());
@@ -440,7 +453,7 @@ pub mod display {
                             println!();
                             break;
                         }
-                        'A' => {
+                        KeyPress::Letter('A') => {
                             println!("\nAnagram: {}", search_string.white().bold());
                             let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
                             let mut word_list: Vec<String> = Vec::new();
@@ -467,7 +480,7 @@ pub mod display {
                             }
                             break;
                         }
-                        'L' => {
+                        KeyPress::Letter('L') => {
                             println!("\nLookup: {}", search_string.white().bold());
                             let mut anagrams: HashMap<String, Vec<usize>> = HashMap::new();
                             let mut word_list: Vec<String> = Vec::new();
@@ -509,12 +522,12 @@ pub mod display {
                             }
                             break;
                         }
-                        'D' => {
+                        KeyPress::Letter('D') => {
                             println!("\nDefine: {}", search_string.white().bold());
                             define(&search_string, OutputType::Normal);
                             break;
                         }
-                        'V' => {
+                        KeyPress::Letter('V') => {
                             println!();
                             let results = reverse(&search_string);
                             for s in results {
@@ -522,7 +535,7 @@ pub mod display {
                             }
                             break;
                         }
-                        'G' => {
+                        KeyPress::Letter('G') => {
                             println!("\nRegular: {}", search_string.white().bold());
                             let results1 = regular_patterns(&search_string, false);
                             let results2 = regular_patterns(&search_string, true);
@@ -538,11 +551,11 @@ pub mod display {
                             println!();
                             break;
                         }
-                        'N' => {
+                        KeyPress::Letter('N') => {
                             println!("\nNote: {}", "TODO".white().bold());
                             break;
                         }
-                        'O' => {
+                        KeyPress::Letter('O') => {
                             println!();
                             if clue.is_empty() {
                                 clue = input_string("Enter clue number (e.g. 4A or 7D): ", None);
@@ -553,7 +566,7 @@ pub mod display {
                             }
                             break;
                         }
-                        'E' => {
+                        KeyPress::Letter('E') => {
                             println!();
                             let mut sorted_pairs: Vec<(&String, &Datum)> = data.iter().collect();
                             sorted_pairs.sort_by(|a, b| a.0.cmp(b.0));
