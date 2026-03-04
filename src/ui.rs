@@ -14,8 +14,11 @@ pub mod display {
     use std::collections::HashMap;
     use std::collections::HashSet;
     use std::io::stdout;
+    use std::io::Write;
 
     use colored::Colorize;
+    use crossterm::cursor::RestorePosition;
+    use crossterm::cursor::SavePosition;
     use crossterm::cursor::{MoveLeft, MoveRight, MoveTo, MoveToColumn};
     use crossterm::event::KeyCode;
     use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
@@ -37,6 +40,7 @@ pub mod display {
         Escape,
         Backspace,
         Delete,
+        Space,
         NoOp,
     }
 
@@ -173,81 +177,50 @@ pub mod display {
     }
 
     pub fn interactive_remove(search_string: String) {
-        use crossterm::{
-            cursor::{MoveToColumn, RestorePosition, SavePosition},
-            event::{self, Event, KeyCode, KeyEvent, KeyEventKind},
-            execute,
-            style::Print,
-            terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
-        };
-        use std::io::stdout;
         let mut s = search_string.to_uppercase().clone();
         let mut removed = "".to_string();
-        enable_raw_mode().unwrap();
-        let mut stdout = stdout();
-        println!();
         loop {
             if s.is_empty() {
                 break;
             }
-            execute!(
-                stdout,
-                MoveToColumn(0),
-                Clear(ClearType::CurrentLine),
-                Print(format!("{} ", s)),
-                SavePosition
-            )
-            .unwrap();
+            crossterm_clear_line();
+            print!("{} ", s);
+            crossterm_save_pos();
             if !removed.is_empty() {
-                execute!(
-                    stdout,
-                    SavePosition,
-                    Print(format!(" removed: {}  ", removed))
-                )
-                .unwrap();
+                print!(" removed: {}", removed);
             }
-            execute!(
-                stdout,
-                Print(format!(
-                    "  ({}) - esc to quit, space to reset",
-                    search_string.len()
-                )),
-                RestorePosition
-            )
-            .unwrap();
-
-            if let Event::Key(KeyEvent { code, kind, .. }) = event::read().unwrap() {
-                if kind == KeyEventKind::Press {
-                    if code == KeyCode::Esc {
-                        execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
-                        break;
-                    }
-                    let c = code.as_char();
-                    if c.is_some() {
-                        if code.as_char().unwrap() == ' ' {
-                            // Spacebar resets word
-                            s = search_string.to_uppercase().clone();
-                            removed = "".to_string();
-                            continue;
-                        }
-                        let c = code.as_char().unwrap().to_ascii_uppercase();
-                        if let Some(pos) = s.find(c) {
-                            s.remove(pos);
-                            removed.push(c);
-                        } else {
-                            // Print the bell (beep)
-                            print!("{}", 0x07 as char);
-                        }
+            print!("  ({}) - esc to quit, space to reset", search_string.len());
+            crossterm_restore_pos();
+            flush();
+            let k = get_key();
+            match k {
+                KeyPress::Letter(c @ 'A'..'Z') => {
+                    if let Some(pos) = s.find(c) {
+                        s.remove(pos);
+                        removed.push(c);
+                    } else {
+                        // Print the bell (beep)
+                        print!("{}", 0x07 as char);
                     }
                 }
+                KeyPress::Special(SpecialKey::Space) => {
+                    s = search_string.to_uppercase().clone();
+                    removed = "".to_string();
+                    continue;
+                }
+                KeyPress::Special(SpecialKey::Escape) => {
+                    crossterm_clear_line();
+                    break;
+                }
+                _ => {} // ignore
             }
         }
-        execute!(stdout, MoveToColumn(0), Clear(ClearType::CurrentLine)).unwrap();
-        disable_raw_mode().unwrap();
-        if !removed.is_empty() {
-            println!("{}", removed);
-        }
-        println!();
+        crossterm_clear_line();
+        println!("{}", removed.yellow());
+    }
+
+    fn flush() {
+        let _ = std::io::stdout().flush();
     }
 
     fn crossterm_get_key() -> KeyCode {
@@ -298,9 +271,22 @@ pub mod display {
         let _ = disable_raw_mode();
     }
 
+    fn crossterm_save_pos() {
+        let _ = enable_raw_mode();
+        let _ = stdout().queue(SavePosition);
+        let _ = disable_raw_mode();
+    }
+
+    fn crossterm_restore_pos() {
+        let _ = enable_raw_mode();
+        let _ = stdout().queue(RestorePosition);
+        let _ = disable_raw_mode();
+    }
+
     fn get_key() -> KeyPress {
         let code = crossterm_get_key();
         match code {
+            KeyCode::Char(' ') => KeyPress::Special(SpecialKey::Space),
             KeyCode::Char(c) if c.is_ascii_alphabetic() => KeyPress::Letter(c.to_ascii_uppercase()),
             KeyCode::Left => KeyPress::Special(SpecialKey::LeftArrow),
             KeyCode::Right => KeyPress::Special(SpecialKey::RightArrow),
@@ -360,7 +346,6 @@ pub mod display {
 
     pub fn tui() -> Result<(), rustyline::error::ReadlineError> {
         use crate::expand_found_string;
-        use std::io::{self, Write};
 
         let mut data: HashMap<String, Datum> = HashMap::new();
         println!();
@@ -427,13 +412,13 @@ pub mod display {
                     "S".yellow(),
                     "Q".yellow(),
                 );
-                io::stdout().flush()?;
+                flush();
                 loop {
                     print!(">");
-                    io::stdout().flush()?;
+                    flush();
                     let k = get_key();
                     crossterm_clear_line();
-                    io::stdout().flush()?;
+                    flush();
                     match k {
                         KeyPress::Letter('X') => {
                             let _ = edit_entry("..M..T.R");
