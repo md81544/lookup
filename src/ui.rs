@@ -209,6 +209,7 @@ pub mod display {
                 KeyPress::Special(SpecialKey::Space) => {
                     s = search_string.to_uppercase().clone();
                     removed = "".to_string();
+                    current_col = 0;
                     continue;
                 }
                 KeyPress::Special(SpecialKey::Escape) => {
