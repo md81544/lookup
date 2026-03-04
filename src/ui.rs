@@ -238,14 +238,14 @@ pub mod display {
         keycode
     }
 
-    #[allow(dead_code)] // REMOVE THIS LINE
+    #[allow(dead_code)] // TODO REMOVE WHEN USED
     fn crossterm_move_left(cols: u16) {
         let _ = enable_raw_mode();
         let _ = stdout().queue(MoveLeft(cols));
         let _ = disable_raw_mode();
     }
 
-    #[allow(dead_code)] // REMOVE THIS LINE
+    #[allow(dead_code)] // TODO REMOVE WHEN USED
     fn crossterm_move_right(cols: u16) {
         let _ = enable_raw_mode();
         let _ = stdout().queue(MoveRight(cols));
@@ -281,6 +281,12 @@ pub mod display {
         let _ = enable_raw_mode();
         let _ = stdout().queue(RestorePosition);
         let _ = disable_raw_mode();
+    }
+
+    #[allow(dead_code)] // TODO REMOVE WHEN USED
+    fn crossterm_get_pos() -> (u16, u16) {
+        // Returns the cursor position (column, row).
+        crossterm::cursor::position().unwrap_or((0, 0))
     }
 
     fn get_key() -> KeyPress {
