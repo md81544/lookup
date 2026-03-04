@@ -13,9 +13,13 @@ pub mod display {
     use crate::OutputType;
     use std::collections::HashMap;
     use std::collections::HashSet;
+    use std::io::stdout;
 
     use colored::Colorize;
+    use crossterm::cursor::{MoveLeft, MoveRight, MoveTo, MoveToColumn};
     use crossterm::event::KeyCode;
+    use crossterm::terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType};
+    use crossterm::QueueableCommand;
     use rustyline::config::Configurer;
 
     struct Datum {
@@ -33,7 +37,7 @@ pub mod display {
         Escape,
         Backspace,
         Delete,
-        NoOp
+        NoOp,
     }
 
     #[derive(Debug, PartialEq)]
@@ -246,7 +250,7 @@ pub mod display {
         println!();
     }
 
-    fn get_crossterm_key() -> KeyCode {
+    fn crossterm_get_key() -> KeyCode {
         use crossterm::event::{self, Event, KeyEvent};
         use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
         let _ = enable_raw_mode();
@@ -261,8 +265,41 @@ pub mod display {
         keycode
     }
 
+    #[allow(dead_code)] // REMOVE THIS LINE
+    fn crossterm_move_left(cols: u16) {
+        let _ = enable_raw_mode();
+        let _ = stdout().queue(MoveLeft(cols));
+        let _ = disable_raw_mode();
+    }
+
+    #[allow(dead_code)] // REMOVE THIS LINE
+    fn crossterm_move_right(cols: u16) {
+        let _ = enable_raw_mode();
+        let _ = stdout().queue(MoveRight(cols));
+        let _ = disable_raw_mode();
+    }
+
+    fn crossterm_move_to_column(col: u16) {
+        let _ = enable_raw_mode();
+        let _ = stdout().queue(MoveToColumn(col));
+        let _ = disable_raw_mode();
+    }
+
+    fn crossterm_move_to(x: u16, y: u16) {
+        let _ = enable_raw_mode();
+        let _ = stdout().queue(MoveTo(x, y));
+        let _ = disable_raw_mode();
+    }
+
+    fn crossterm_clear_line() {
+        let _ = enable_raw_mode();
+        let _ = stdout().queue(Clear(ClearType::CurrentLine));
+        crossterm_move_to_column(0);
+        let _ = disable_raw_mode();
+    }
+
     fn get_key() -> KeyPress {
-        let code = get_crossterm_key();
+        let code = crossterm_get_key();
         match code {
             KeyCode::Char(c) if c.is_ascii_alphabetic() => KeyPress::Letter(c.to_ascii_uppercase()),
             KeyCode::Left => KeyPress::Special(SpecialKey::LeftArrow),
@@ -273,6 +310,18 @@ pub mod display {
             KeyCode::Delete => KeyPress::Special(SpecialKey::Delete),
             _ => KeyPress::Special(SpecialKey::NoOp),
         }
+    }
+
+    fn edit_entry(found_letters: &str) -> String {
+        // Note! This is a test function, it should eventually allow
+        // editing of a string in a stylised fashion
+        println!();
+        for c in found_letters.chars() {
+            print!("{} ", c);
+        }
+        println!("\n");
+        crossterm_move_to(20, 10);
+        "".to_string()
     }
 
     fn input_string(prompt: &str, default: Option<&str>) -> String {
@@ -383,9 +432,12 @@ pub mod display {
                     print!(">");
                     io::stdout().flush()?;
                     let k = get_key();
-                    print!("\x08 \x08"); // backspace
+                    crossterm_clear_line();
                     io::stdout().flush()?;
                     match k {
+                        KeyPress::Letter('X') => {
+                            let _ = edit_entry("..M..T.R");
+                        }
                         KeyPress::Letter('J') => {
                             println!();
                             let mut letters = ".".to_string();
