@@ -179,18 +179,21 @@ pub mod display {
     pub fn interactive_remove(search_string: String) {
         let mut s = search_string.to_uppercase().clone();
         let mut removed = "".to_string();
+        let mut current_col: u16 = 0;
         loop {
             if s.is_empty() {
                 break;
             }
+            if current_col > s.len() as u16 - 1{
+                current_col = s.len() as u16 - 1;
+            }
             crossterm_clear_line();
             print!("{} ", s);
-            crossterm_save_pos();
             if !removed.is_empty() {
                 print!(" removed: {}", removed);
             }
             print!("  ({}) - esc to quit, space to reset", search_string.len());
-            crossterm_restore_pos();
+            crossterm_move_to_column(current_col);
             flush();
             let k = get_key();
             match k {
@@ -211,6 +214,24 @@ pub mod display {
                 KeyPress::Special(SpecialKey::Escape) => {
                     crossterm_clear_line();
                     break;
+                }
+                KeyPress::Special(SpecialKey::LeftArrow) => {
+                    if current_col > 0 {
+                        current_col -= 1;
+                    }
+                }
+                KeyPress::Special(SpecialKey::RightArrow) => {
+                    if current_col < s.len() as u16 - 1 {
+                        current_col += 1;
+                    }
+                }
+                KeyPress::Special(SpecialKey::Enter) => {
+                    let ch = s[current_col as usize..current_col as usize + 1]
+                        .chars()
+                        .next()
+                        .unwrap();
+                    s.remove(current_col as usize);
+                    removed.push(ch);
                 }
                 _ => {} // ignore
             }
@@ -271,12 +292,14 @@ pub mod display {
         let _ = disable_raw_mode();
     }
 
+    #[allow(dead_code)] // TODO REMOVE WHEN USED
     fn crossterm_save_pos() {
         let _ = enable_raw_mode();
         let _ = stdout().queue(SavePosition);
         let _ = disable_raw_mode();
     }
 
+    #[allow(dead_code)] // TODO REMOVE WHEN USED
     fn crossterm_restore_pos() {
         let _ = enable_raw_mode();
         let _ = stdout().queue(RestorePosition);
