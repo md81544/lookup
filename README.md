@@ -1,6 +1,10 @@
 # lookup
 Rust-based word game solver
 
+*Note, this was a very early project for learning Rust so could be improved in many
+areas (e.g. preloading data into a class). However, it works excellently for me, and
+I use it daily as is.*
+
 Stuck finding a crossword clue, where you've got several letters? Try
 
     lookup _R_E_T
