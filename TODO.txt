@@ -1,7 +1,11 @@
 * Create own "input string" function to replace rustyline which does realtime letter
   counting, and defaults to overwrite
 
+* Once the above is complete, entering a "found" string can be limited to letters
+  entered in the "search" string only
+
 * Error immediately if "F"ound string contains a letter missing from search string
+  (won't be necessary if the above two are implemented)
 
 * Allow hyphen as word separator in -f
 

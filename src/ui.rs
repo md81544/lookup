@@ -184,7 +184,7 @@ pub mod display {
             if s.is_empty() {
                 break;
             }
-            if current_col > s.len() as u16 - 1{
+            if current_col > s.len() as u16 - 1 {
                 current_col = s.len() as u16 - 1;
             }
             crossterm_clear_line();
@@ -202,8 +202,7 @@ pub mod display {
                         s.remove(pos);
                         removed.push(c);
                     } else {
-                        // Print the bell (beep)
-                        print!("{}", 0x07 as char);
+                        beep();
                     }
                 }
                 KeyPress::Special(SpecialKey::Space) => {
@@ -239,6 +238,11 @@ pub mod display {
         }
         crossterm_clear_line();
         println!("{}", removed.yellow());
+    }
+
+    fn beep() {
+        // Print the bell symbol
+        print!("{}", 0x07 as char);
     }
 
     fn flush() {
