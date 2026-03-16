@@ -376,6 +376,10 @@ pub mod display {
         // supplied in the default. Or should the default always
         // be populated? In which case do we need length?
 
+        // Need an insertion mode for just entering a new string
+        // (not switchable, as a parameter).
+        // Insert mode should show letter count
+
         let mut local_allowed = allowed.to_string();
         let rc = default.unwrap_or("").to_string();
         let mut result: Vec<char> = rc.chars().collect();
