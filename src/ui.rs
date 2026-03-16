@@ -271,7 +271,6 @@ pub mod display {
         let _ = disable_raw_mode();
     }
 
-    #[allow(dead_code)] // TODO REMOVE WHEN USED
     fn crossterm_move_right(cols: u16) {
         let _ = enable_raw_mode();
         let _ = stdout().queue(MoveRight(cols));
@@ -284,6 +283,7 @@ pub mod display {
         let _ = disable_raw_mode();
     }
 
+    #[allow(dead_code)] // TODO REMOVE WHEN USED
     fn crossterm_move_to(x: u16, y: u16) {
         let _ = enable_raw_mode();
         let _ = stdout().queue(MoveTo(x, y));
@@ -297,14 +297,12 @@ pub mod display {
         let _ = disable_raw_mode();
     }
 
-    #[allow(dead_code)] // TODO REMOVE WHEN USED
     fn crossterm_save_pos() {
         let _ = enable_raw_mode();
         let _ = stdout().queue(SavePosition);
         let _ = disable_raw_mode();
     }
 
-    #[allow(dead_code)] // TODO REMOVE WHEN USED
     fn crossterm_restore_pos() {
         let _ = enable_raw_mode();
         let _ = stdout().queue(RestorePosition);
@@ -322,6 +320,7 @@ pub mod display {
         match code {
             KeyCode::Char(' ') => KeyPress::Special(SpecialKey::Space),
             KeyCode::Char(c) if c.is_ascii_alphabetic() => KeyPress::Letter(c.to_ascii_uppercase()),
+            KeyCode::Char(c) if c == '/' => KeyPress::Letter('/'),
             KeyCode::Left => KeyPress::Special(SpecialKey::LeftArrow),
             KeyCode::Right => KeyPress::Special(SpecialKey::RightArrow),
             KeyCode::Esc => KeyPress::Special(SpecialKey::Escape),
@@ -330,18 +329,6 @@ pub mod display {
             KeyCode::Delete => KeyPress::Special(SpecialKey::Delete),
             _ => KeyPress::Special(SpecialKey::NoOp),
         }
-    }
-
-    fn edit_entry(found_letters: &str) -> String {
-        // Note! This is a test function, it should eventually allow
-        // editing of a string in a stylised fashion
-        println!();
-        for c in found_letters.chars() {
-            print!("{} ", c);
-        }
-        println!("\n");
-        crossterm_move_to(20, 10);
-        "".to_string()
     }
 
     fn input_string(prompt: &str, default: Option<&str>) -> String {
@@ -376,6 +363,117 @@ pub mod display {
                 rc
             }
         }
+    }
+
+    fn input_string_new(
+        prompt: &str,
+        default: Option<&str>,
+        length: usize,
+        allowed: &str,
+    ) -> String {
+        let mut local_allowed = allowed.to_string();
+        let rc = default.unwrap_or("").to_string();
+        let mut result: Vec<char> = rc.chars().collect();
+        print!("\n{}  ", prompt);
+        crossterm_save_pos();
+        if length > result.len() {
+            for _ in result.len()..length {
+                result.push('.');
+            }
+        }
+        let mut pos: usize = 0;
+        loop {
+            crossterm_restore_pos();
+            for c in result.iter() {
+                if *c == '.' {
+                    print!("_");
+                } else {
+                    print!("{}", c);
+                }
+                print!(" ");
+            }
+            print!("  ");
+            crossterm_restore_pos();
+            if pos > 0 {
+                // crossterm's Move{Right,Left}, if passed 0,
+                // moves one instead (potential bug?) so we only
+                // move if pos is not zero
+                crossterm_move_right(pos as u16 * 2);
+            }
+            flush();
+            let k = get_key();
+            match k {
+                KeyPress::Letter(c @ 'A'..'Z') => {
+                    if result[pos] == '/' {
+                        beep();
+                    } else
+                    // empty "allowed" string means no restrictions
+                    if allowed.len() == 0 {
+                        result[pos] = c;
+                        if pos < result.len() - 1 {
+                            pos += 1;
+                        }
+                    } else if let Some(allowed_pos) = local_allowed.find(c) {
+                        let old = result[pos];
+                        result[pos] = c;
+                        if pos < result.len() - 1 {
+                            pos += 1;
+                        }
+                        local_allowed.remove(allowed_pos);
+                        if old != '.' {
+                            local_allowed.push(old);
+                        }
+                    } else {
+                        beep();
+                    }
+                }
+                KeyPress::Special(SpecialKey::RightArrow) => {
+                    if pos < result.len() - 1 {
+                        pos += 1;
+                    }
+                }
+                KeyPress::Special(SpecialKey::LeftArrow) => {
+                    if pos > 0 {
+                        pos -= 1;
+                    }
+                }
+                KeyPress::Special(SpecialKey::Enter) => {
+                    break;
+                }
+                KeyPress::Special(SpecialKey::Escape) => {
+                    result.clear();
+                    break;
+                }
+                sp @ (KeyPress::Special(SpecialKey::Backspace)
+                | KeyPress::Special(SpecialKey::Delete)) => {
+                    if result[pos] == '/' {
+                        result.remove(pos);
+                    } else if result[pos] != '.' {
+                        local_allowed.push(result[pos]);
+                    }
+                    result[pos] = '.';
+                    if sp == KeyPress::Special(SpecialKey::Backspace) {
+                        if pos > 0 {
+                            pos -= 1;
+                        }
+                    }
+                }
+                KeyPress::Letter('/') => {
+                    // Word separators are not allowed on top of existing word
+                    // separators or at the very beginning
+                    if result[pos] == '/' {
+                        beep();
+                    } else if pos == 0 || result[pos - 1] == '/' {
+                        beep();
+                    } else {
+                        result.insert(pos, '/');
+                    }
+                }
+                _ => {}
+            }
+        }
+        println!("\n");
+        result.into_iter().collect()
     }
 
     pub fn tui() -> Result<(), rustyline::error::ReadlineError> {
@@ -454,8 +552,10 @@ pub mod display {
                     crossterm_clear_line();
                     flush();
                     match k {
+                        // 'X' is used for testing... TODO delete this
                         KeyPress::Letter('X') => {
-                            let _ = edit_entry("..M..T.R");
+                            let foo = input_string_new("Enter stuff:", Some(&""), 9, "CELEBRATE");
+                            println!("{}", foo);
                         }
                         KeyPress::Letter('J') => {
                             println!();
