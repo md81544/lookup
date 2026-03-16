@@ -371,6 +371,11 @@ pub mod display {
         length: usize,
         allowed: &str,
     ) -> String {
+
+        // TODO must be able to cope with word separators being
+        // supplied in the default. Or should the default always
+        // be populated? In which case do we need length?
+
         let mut local_allowed = allowed.to_string();
         let rc = default.unwrap_or("").to_string();
         let mut result: Vec<char> = rc.chars().collect();
